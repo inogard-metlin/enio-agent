@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.quot.QuotItemMapper">
+  <sql id="sqlSelect">
+    SELECT qi.rfq_no, 
+           qi.quot_rev, 
+           qi.cus_cd, 
+           qi.item_seq, 
+           qi.rfq_item_seq, 
+           qi.qty, 
+           qi.unit_prc, 
+           qi.amt 
+    FROM   agt_quotitem qi
+  </sql>
+  
+  <select id="findByRfqNoAndQuotRevAndCusCd" resultType="kr.co.inogard.enio.agent.domain.quot.QuotItem">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  qi.rfq_no = #{rfqNo}
+      AND qi.quot_rev = #{quotRev}  
+      AND qi.cus_cd = #{cusCd}
+    ]]>
+  </select>
+  
+	<insert id="add" parameterType="kr.co.inogard.enio.agent.domain.quot.QuotItem">
+  <![CDATA[
+		INSERT INTO agt_quotitem (
+      rfq_no, 
+      quot_rev, 
+      cus_cd, 
+      item_seq, 
+      rfq_item_seq, 
+      qty, 
+      unit_prc, 
+      amt
+    ) VALUES (
+      #{rfqNo}, 
+      #{quotRev}, 
+      #{cusCd}, 
+      #{itemSeq}, 
+      #{rfqItemSeq}, 
+      #{qty}, 
+      #{unitPrc}, 
+      #{amt}
+    ) 
+  ]]>
+	</insert>
+  
+  <delete id="delQuotItem" parameterType="string">
+  <![CDATA[      
+      DELETE agt_quotitem Where rfq_no = #{rfqNo} 
+  ]]>  
+  </delete>  
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.file.FileMapper">
+	<insert id="add" parameterType="kr.co.inogard.enio.agent.domain.file.CmmFile">
+		<selectKey resultType="kr.co.inogard.enio.agent.domain.file.CmmFile" keyProperty="fileNo,svrFileNm,svrFilePath" order="BEFORE">
+		<![CDATA[
+              SELECT A.FILE_NO AS fileNo
+                       ,  A.FILE_NO + '.' + A.EXT AS svrFileNm
+              	       , '/' + SUBSTRING(A.FILE_NO, 1, 2) + '/' + SUBSTRING(A.FILE_NO, 3, 4) + '/' + SUBSTRING(A.FILE_NO, 7, 2) + '/' + SUBSTRING(A.FILE_NO, 9, 2) AS svrFilePath
+                FROM( 
+                          SELECT A.FILE_NO
+                                    , RIGHT(A.CLI_FILE_NM, CHARINDEX('.', REVERSE(A.CLI_FILE_NM)) - 1) AS EXT
+                      	    FROM (
+                                        SELECT #{docType} + CONVERT(CHAR(8), GETDATE(), 112) + A.SEQ AS FILE_NO
+                                                 ,  A.CLI_FILE_NM
+                      		             FROM (
+                                                    SELECT RIGHT('0000000000' + CONVERT(VARCHAR, ISNULL(MAX(SUBSTRING(I.FILE_NO, 11, 10)), '0000000000') + 1), 10) AS SEQ
+                                                             ,  #{cliFileNm} AS CLI_FILE_NM
+                                        		     FROM AGT_FILE I 
+                                        		    WHERE I.FILE_NO LIKE #{docType} + CONVERT(CHAR(8), GETDATE(), 112) + '%'
+                      		                      ) A
+              	                       ) A
+                          ) A		
+        ]]>
+		</selectKey>
+    	<![CDATA[
+                  INSERT INTO AGT_FILE(FILE_NO,CLI_FILE_NM,SVR_FILE_NM,SVR_FILE_PATH,FILE_SZ,REG_DT)
+                  SELECT #{fileNo},#{cliFileNm},#{svrFileNm},#{svrFilePath},#{fileSz},CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '') 
+		]]>
+	</insert>
+	
+</mapper>

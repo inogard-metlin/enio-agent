@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.file.FileMapper">
+	<insert id="add" parameterType="kr.co.inogard.enio.agent.domain.file.CmmFile">
+		<selectKey resultType="kr.co.inogard.enio.agent.domain.file.CmmFile" keyProperty="fileNo,svrFileNm,svrFilePath" order="BEFORE">
+		<![CDATA[
+            select
+                A.FILE_NO as fileNo,
+                A.FILE_NO || '.' || A.EXT as svrFileNm,
+                '/' || SUBSTR(A.FILE_NO, 1, 2) || '/' || SUBSTR(A.FILE_NO, 3, 4) || '/' || SUBSTR(A.FILE_NO, 7, 2) || '/' || SUBSTR(A.FILE_NO, 9, 2) as svrFilePath
+            from
+                (
+                    select
+                        A.FILE_NO,
+                        SUBSTR(A.CLI_FILE_NM, INSTR(A.CLI_FILE_NM, '.', -1) + 1, LENGTH(A.CLI_FILE_NM) - INSTR(A.CLI_FILE_NM, '.', -1)) as EXT
+                    from
+                        (
+                            select
+                                # {docType} || to_char(SYSDATE, 'YYYYMMDD') || A.SEQ as FILE_NO,
+                                A.CLI_FILE_NM
+                            from
+                                (
+                                    select
+                                        SUBSTR(to_char(TO_NUMBER('1' || nvl(max(SUBSTR(I.FILE_NO, 11, 10)), '0000000000') + 1)), 2, 10) as SEQ,
+                                        # {cliFileNm} as CLI_FILE_NM
+                                    from
+                                        AGT_FILE I
+                                    where
+                                        I.FILE_NO like # {docType} || to_char(SYSDATE, 'YYYYMMDD') || '%'
+                                ) A
+                        ) A
+                ) A	
+        ]]>
+		</selectKey>
+    	<![CDATA[
+              INSERT INTO AGT_FILE(
+                    FILE_NO
+                  , CLI_FILE_NM
+                  , SVR_FILE_NM
+                  , SVR_FILE_PATH
+                  , FILE_SZ,REG_DT
+              )
+              SELECT #{fileNo}
+                        , #{cliFileNm}
+                        , #{svrFileNm}
+                        , #{svrFilePath}
+                        , #{fileSz}
+                        , TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS') 
+                FROM SYSIBM.DUAL
+		]]>
+	</insert>
+	
+</mapper>

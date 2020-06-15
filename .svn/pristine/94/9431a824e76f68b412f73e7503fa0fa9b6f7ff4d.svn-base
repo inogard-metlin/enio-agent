@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.rtlog.RtLogMapper">
+	<insert id="add" parameterType="RtLog" useGeneratedKeys="false">
+		<selectKey resultType="RtLog" keyProperty="logNo" order="BEFORE">
+		<![CDATA[
+			SELECT B.agt_cd + CONVERT(CHAR(8), GETDATE(), 112) + A.seq AS logNo 
+			FROM   (
+            			  SELECT RIGHT('0000000' + CONVERT(VARCHAR, ISNULL(MAX(SUBSTRING(I.log_no, 14, 7)), '0000000') + 1), 7) AS SEQ
+            	      FROM   agt_rtlog I 
+            	             cross join agt_agent C 
+            	      WHERE  I.log_no LIKE C.agt_cd + CONVERT(CHAR(8), GETDATE(), 112) + '%') A 
+	    cross join agt_agent B 
+    ]]>
+		</selectKey>
+    <![CDATA[
+			INSERT INTO agt_rtlog (
+			  log_no, 
+			  log_lvl, 
+			  ttl, 
+			  message, 
+			  solve_yn, 
+			  solve_dt, 
+			  reg_dt
+	    ) VALUES (
+			 #{logNo}, 
+             #{logLvl}, 
+             #{ttl},
+             #{message},        
+             #{solveYn}, 
+             CONVERT(CHAR(8), #{solveDt}, 112) + REPLACE(CONVERT(CHAR(8), #{solveDt}, 114), ':', ''), 
+             CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '') 
+			)
+    ]]>
+	</insert>
+
+	<update id="updateSolved" parameterType="RtLog">
+    <![CDATA[
+			UPDATE agt_rtlog 
+			SET    solve_dt = CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', ''), 
+			       solve_yn = #{solveYn} 
+			WHERE  log_no = #{logNo} 
+		]]>
+	</update>
+
+	
+	<select id="findByLogNo" parameterType="string" resultType="RtLog">
+    <![CDATA[
+			SELECT A.log_no, 
+		       A.log_lvl, 
+		       A.ttl, 
+		       A.message, 
+		       A.solve_yn,
+		       dbo.getStringToDateTime(A.solve_dt) AS SOLVE_DT, 
+		       dbo.getStringToDateTime(A.Reg_Dt) AS REG_DT 
+		FROM   agt_rtlog A 
+		WHERE  A.log_no = #{logNo} 
+    ]]>
+	</select>
+</mapper>

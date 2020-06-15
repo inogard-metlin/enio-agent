@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.item.ItemMapper">
+  <sql id="sqlSelect">
+    SELECT COUNT(*) OVER () filtered_count, 
+           i.item_cd, 
+           i.item_nm, 
+           i.size_nm, 
+           i.model_nm, 
+           i.unit_cd, 
+           i.mk_comp_nm, 
+           To_date(i.reg_dt, 'YYYYMMDDHH24MISS') AS reg_dt, 
+           i.use_yn, 
+           i.cls_cd, 
+           To_date(i.e4u_if_dt, 'YYYYMMDDHH24MISS') AS e4u_if_dt, 
+           i.erp_item_cd 
+    FROM   agt_item i
+  </sql>
+  
+  <select id="findByItemCd" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.item.Item">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  i.item_cd = #{value} 
+    ]]>
+  </select>
+  
+  <select id="findAll" resultType="kr.co.inogard.enio.agent.domain.item.Item">
+    SELECT *
+    FROM (
+      SELECT  ROWNUM AS RNUM,
+              A.*
+      FROM (
+        <include refid="sqlSelect"/>
+        <where>
+          <if test="search != null">
+            <if test="search.value != null and search.value != ''">
+            <![CDATA[
+            (
+              i.erp_item_cd like '%'||#{search.value}||'%'
+              or i.item_nm like '%'||#{search.value}||'%'
+              or i.size_nm like '%'||#{search.value}||'%'
+              or i.model_nm like '%'||#{search.value}||'%'
+              or i.unit_cd like '%'||#{search.value}||'%'
+              or i.mk_comp_nm like '%'||#{search.value}||'%'
+              or i.e4u_item_cd like '%'||#{search.value}||'%'
+            )
+            ]]>
+            </if>
+          </if>
+        </where>
+        <choose>
+          <when test="pageable != null and pageable.sort != null">
+            <foreach item="order" collection="pageable.sort" open="ORDER BY " separator=",">
+              ${order.property} ${order.direction}
+            </foreach>
+          </when>
+          <otherwise>
+            ORDER BY reg_dt desc
+          </otherwise>
+        </choose>
+      ) A
+      <if test="pageable != null">
+      <![CDATA[              
+        WHERE ROWNUM <= ((#{pageable.page} + 1) * #{pageable.size})
+      ]]>
+      </if>
+    )
+    <if test="pageable != null">
+    <![CDATA[
+      WHERE RNUM > (#{pageable.page} * #{pageable.size})
+    ]]>
+    </if>
+  </select>
+  
+  <select id="count" resultType="long">
+  <![CDATA[
+    SELECT count(*)
+    FROM agt_item
+  ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.item.Item">
+  <![CDATA[
+    INSERT INTO agt_item (
+      item_cd, 
+      item_nm, 
+      size_nm, 
+      model_nm, 
+      unit_cd, 
+      mk_comp_nm, 
+      reg_dt, 
+      use_yn, 
+      cls_cd, 
+      e4u_if_dt, 
+      erp_item_cd
+    ) 
+    SELECT di.e4u_item_cd, 
+           di.item_nm, 
+           di.size_nm, 
+           di.model_nm, 
+           di.unit_cd, 
+           di.mk_comp_nm, 
+           di.reg_dt, 
+           di.use_yn, 
+           di.cls_cd, 
+           di.e4u_if_dt, 
+           di.erp_item_cd 
+    FROM   agt_dum_item di
+    WHERE di.erp_item_cd = #{erpItemCd}
+  ]]>
+  </insert>
+
+  
+</mapper>

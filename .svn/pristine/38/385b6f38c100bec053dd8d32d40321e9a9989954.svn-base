@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.pr.PrMapper">
+  <sql id="sqlSelect">
+    SELECT Count(*) over () filtered_count,
+           p.pr_no, 
+           p.ttl, 
+           p.pr_typecd, 
+           p.tax_typecd, 
+           p.io_flag, 
+           To_date(p.dlv_fr_ymd, 'YYYYMMDD') AS dlv_fr_ymd, 
+           To_date(p.dlv_to_ymd, 'YYYYMMDD') AS dlv_to_ymd, 
+           p.dlv_loc, 
+           To_date(p.dlv_req_ymd, 'YYYYMMDD') AS dlv_req_ymd, 
+           p.spot_dscr_yn, 
+           To_date(p.spot_dscr_dt, 'YYYYMMDDHH24MISS') AS spot_dscr_dt, 
+           p.spot_dscr_usrnm, 
+           p.spot_dscr_usrtel, 
+           p.spot_dscr_loc, 
+           p.req_usr_nm, 
+           p.req_usr_tel, 
+           p.gm_chrgr_cd, 
+           p.pr_chrgr_cd, 
+           p.gr_chrgr_cd, 
+           p.chk_chrgr_cd, 
+           To_date(p.reg_dt, 'YYYYMMDDHH24MISS') AS reg_dt, 
+           p.pr_rmrk, 
+           p.return_yn, 
+           To_date(p.return_dt, 'YYYYMMDDHH24MISS') AS return_dt, 
+           p.return_rmrk, 
+           p.prebid_yn,
+           To_date(p.e4u_if_dt, 'YYYYMMDDHH24MISS') AS e4u_if_dt, 
+           p.erp_sync_yn, 
+           To_date(p.erp_sync_dt, 'YYYYMMDDHH24MISS') AS erp_sync_dt, 
+           p.erp_pr_no, 
+           p.erp_rfq_no, 
+           p.bid_sub_typecd, 
+           p.bid_typecd 
+    FROM   agt_pr p 
+           left join agt_user gmUser 
+                  ON( p.gm_chrgr_cd = gmUser.user_cd ) 
+           left join agt_user prUser 
+                  ON( p.pr_chrgr_cd = prUser.user_cd ) 
+           left join agt_user grUser 
+                  ON( p.gr_chrgr_cd = grUser.user_cd ) 
+           left join agt_user chkUser 
+                  ON( p.chk_chrgr_cd = chkUser.user_cd )       
+  </sql>
+
+  <select id="findByPrNo" resultType="kr.co.inogard.enio.agent.domain.pr.Pr">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  p.pr_no = #{prNo} 
+    ]]>
+  </select>
+
+  <select id="findAll" resultType="kr.co.inogard.enio.agent.domain.pr.Pr">
+    SELECT *
+    FROM (
+      SELECT  ROWNUM AS RNUM,
+              A.*
+      FROM (
+        <include refid="sqlSelect"/>
+        <where>
+          <if test="search != null">
+            <if test="search.value != null and search.value != ''">
+            <![CDATA[
+            (
+              p.pr_no like '%'||#{search.value}||'%'
+              or p.ttl like '%'||#{search.value}||'%'
+              or p.erp_pr_no like '%'||#{search.value}||'%'
+            )
+            ]]>
+            </if>
+          </if>
+        </where>
+        <choose>
+          <when test="pageable != null and pageable.sort != null">
+            <foreach item="order" collection="pageable.sort" open="ORDER BY " separator=",">
+              ${order.property} ${order.direction}
+            </foreach>
+          </when>
+          <otherwise>
+            reg_dt desc
+          </otherwise>
+        </choose>
+      ) A
+      <if test="pageable != null">
+      <![CDATA[              
+        WHERE ROWNUM <= ((#{pageable.page} + 1) * #{pageable.size})
+      ]]>
+      </if>
+    )
+    <if test="pageable != null">
+    <![CDATA[
+      WHERE RNUM > (#{pageable.page} * #{pageable.size})
+    ]]>
+    </if>
+  </select>
+
+  <select id="count" resultType="long">
+  <![CDATA[
+    SELECT count(*)
+    FROM agt_pr
+  ]]>
+  </select>
+
+  <select id="findPrNoFromRfqNo" resultType="string">
+  <![CDATA[
+    SELECT Max(a.pr_no) AS pr_no 
+    FROM   agt_rfqitem a 
+    WHERE  a.rfq_no = #{rfqNo} 
+  ]]>
+  </select>
+
+  <select id="findPrNoFromPoNo" resultType="string">
+  <![CDATA[
+    SELECT Max(a.pr_no) AS pr_no 
+    FROM   agt_poitem a 
+    WHERE  a.po_no = #{poNo} 
+  ]]>
+  </select>
+
+  <insert id="addFromDummy" parameterType="kr.co.inogard.enio.agent.domain.pr.Pr">
+  <![CDATA[
+    INSERT INTO agt_pr (
+      pr_no, 
+      ttl, 
+      pr_typecd, 
+      tax_typecd, 
+      io_flag, 
+      gm_chrgr_cd, 
+      pr_chrgr_cd, 
+      gr_chrgr_cd, 
+      chk_chrgr_cd, 
+      dlv_fr_ymd, 
+      dlv_to_ymd, 
+      req_usr_nm, 
+      req_usr_tel, 
+      reg_dt, 
+      pr_rmrk, 
+      dlv_loc, 
+      dlv_req_ymd, 
+      return_yn, 
+      return_dt, 
+      return_rmrk, 
+      spot_dscr_yn, 
+      spot_dscr_dt, 
+      spot_dscr_usrnm, 
+      spot_dscr_usrtel, 
+      spot_dscr_loc, 
+      prebid_yn, 
+      e4u_if_dt, 
+      erp_pr_no, 
+      erp_rfq_no,
+      sub_org_cd
+    ) 
+		SELECT dp.e4u_pr_no, 
+           dp.ttl, 
+           dp.pr_typecd, 
+           dp.tax_typecd, 
+           dp.io_flag, 
+           gmUser.e4u_user_cd AS gm_chrgr_cd, 
+           prUser.e4u_user_cd AS pr_chrgr_cd, 
+           grUser.e4u_user_cd AS gr_chrgr_cd, 
+           chkUser.e4u_user_cd AS chk_chrgr_cd, 
+           dp.dlv_fr_ymd, 
+           dp.dlv_to_ymd, 
+           dp.req_usr_nm, 
+           dp.req_usr_tel, 
+           dp.reg_dt, 
+           dp.pr_rmrk, 
+           dp.dlv_loc, 
+           dp.dlv_req_ymd, 
+           'N', 
+           NULL, 
+           NULL, 
+           dp.spot_dscr_yn, 
+           dp.spot_dscr_dt, 
+           dp.spot_dscr_usrnm, 
+           dp.spot_dscr_usrtel, 
+           dp.spot_dscr_loc, 
+           dp.prebid_yn, 
+           dp.e4u_if_dt, 
+           dp.erp_pr_no, 
+           dp.erp_rfq_no,
+           dp.sub_org_cd
+    FROM   agt_dum_pr dp 
+           LEFT JOIN agt_dum_user gmUser
+                  ON( dp.gm_chrgr_cd = gmUser.erp_user_cd ) 
+           LEFT JOIN agt_dum_user prUser 
+                  ON( dp.pr_chrgr_cd = prUser.erp_user_cd ) 
+           LEFT JOIN agt_dum_user grUser 
+                  ON( dp.gr_chrgr_cd = grUser.erp_user_cd ) 
+           LEFT JOIN agt_dum_user chkUser
+                  ON( dp.chk_chrgr_cd = chkUser.erp_user_cd )  
+    WHERE  dp.erp_pr_no = #{erpPrNo} 
+  ]]>
+  </insert>
+
+  <insert id="addByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.Pr">
+  <![CDATA[
+			INSERT INTO agt_pr (
+        pr_no, 
+        ttl, 
+        pr_typecd, 
+        tax_typecd, 
+        io_flag, 
+        gm_chrgr_cd, 
+        pr_chrgr_cd, 
+        gr_chrgr_cd, 
+        chk_chrgr_cd, 
+        dlv_fr_ymd, 
+        dlv_to_ymd, 
+        req_usr_nm, 
+        req_usr_tel, 
+        reg_dt, 
+        pr_rmrk, 
+        dlv_loc, 
+        dlv_req_ymd, 
+        return_yn, 
+        return_dt, 
+        return_rmrk, 
+        spot_dscr_yn, 
+        spot_dscr_dt, 
+        spot_dscr_usrnm, 
+        spot_dscr_usrtel, 
+        spot_dscr_loc, 
+        prebid_yn,
+        e4u_if_dt,
+        erp_pr_no,
+        erp_rfq_no
+      ) VALUES (
+        #{prNo}, 
+        #{ttl}, 
+        #{prTypecd}, 
+        #{taxTypecd}, 
+        #{ioFlag},
+        #{gmChrgrCd} , 
+        #{prChrgrCd} , 
+        #{grChrgrCd} , 
+        #{chkChrgrCd} , 
+        NULL, 
+        NULL, 
+        #{reqUsrNm}, 
+        #{reqUsrTel}, 
+        To_char(sysdate, 'YYYYMMDDHH24MISS'), 
+        #{prRmrk}, 
+        #{dlvLoc}, 
+        To_char(#{dlvReqYmd}, 'YYYYMMDD'), 
+        'N', 
+        NULL, 
+        NULL, 
+        #{spotDscrYn}, 
+        To_char(#{spotDscrDt}, 'YYYYMMDDHH24MISS'), 
+        #{spotDscrUsrnm}, 
+        #{spotDscrUsrtel}, 
+        #{spotDscrLoc}, 
+        #{prebidYn},
+        To_char(sysdate, 'YYYYMMDDHH24MISS'),
+        #{erpPrNo},
+        #{erpRfqNo}        
+      ) 
+  ]]>
+  </insert>
+
+  <update id="updateAllChrgrCdByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.Pr">
+  <![CDATA[
+		UPDATE agt_pr 
+		SET    pr_chrgr_cd = (SELECT I.user_cd FROM   agt_user I WHERE  I.e4u_user_cd = #{prChrgrCd}), 
+		       gm_chrgr_cd = (SELECT I.user_cd FROM   agt_user I WHERE  I.e4u_user_cd = #{gmChrgrCd}), 
+		       gr_chrgr_cd = (SELECT I.user_cd FROM   agt_user I WHERE  I.e4u_user_cd = #{grChrgrCd}), 
+		       chk_chrgr_cd = (SELECT I.user_cd FROM   agt_user I WHERE  I.e4u_user_cd = #{chkChrgrCd}) 
+		WHERE  pr_no = #{prNo} 
+  ]]>
+  </update>
+
+  <update id="updateCallSyncToErp" parameterType="hashmap" statementType="CALLABLE">
+    <choose>        
+        <when test="univCd != null and univCd.equals('D0001')"> 
+              <![CDATA[
+                { CALL ADMI.SP_AAPA_BID_LINK_RCV_D0001( #{prNo, mode=IN, jdbcType=VARCHAR}, #{notiKind, mode=IN, jdbcType=VARCHAR} ) }
+              ]]>
+        </when>  
+        <when test="univCd != null and univCd.equals('S0020')">
+              <![CDATA[
+                { CALL ADMI.SP_AAPA_BID_LINK_RCV_S0020( #{prNo, mode=IN, jdbcType=VARCHAR}, #{notiKind, mode=IN, jdbcType=VARCHAR} ) }
+              ]]>
+        </when>  
+        <when test="univCd != null and univCd.equals('S0037')">
+              <![CDATA[
+                { CALL ADMI.SP_AAPA_BID_LINK_RCV( #{prNo, mode=IN, jdbcType=VARCHAR}, #{notiKind, mode=IN, jdbcType=VARCHAR}, #{outCd, mode=OUT, jdbcType=VARCHAR}, #{outMsg, mode=OUT, jdbcType=VARCHAR} ) }
+              ]]>
+        </when>  
+        <when test="univCd != null and univCd.equals('C0001')">
+              <![CDATA[
+                { CALL ADMI.SP_AAPA_BID_LINK_RCV( #{prNo, mode=IN, jdbcType=VARCHAR}, #{notiKind, mode=IN, jdbcType=VARCHAR}, #{outCd, mode=OUT, jdbcType=VARCHAR}, #{outMsg, mode=OUT, jdbcType=VARCHAR} ) }
+              ]]>
+        </when>  
+    </choose>
+  </update>
+  
+</mapper>

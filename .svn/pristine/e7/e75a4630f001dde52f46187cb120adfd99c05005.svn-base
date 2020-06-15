@@ -1,0 +1,49 @@
+logging:
+  path: /data1/webdev2/ebid/enio-agent/logs/
+  
+enio:
+  file:
+    temp-dir: /data1/webdev2/ebid/enio-agent/temp/
+    pds-dir: /data1/webdev2/appnas/tis/ADMI/AAPA/EBID/
+  scheduled:
+    cron: 0 0/2 * * * ?
+
+---   
+spring:
+  profiles: oracle 
+  
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@172.16.25.73:1521:TISD
+    username: EBID
+    password: EBID1027
+    test-on-borrow: true
+    validation-query: SELECT 1 FROM dual
+    
+mybatis:
+  typeAliasesPackage: kr.co.inogard.enio.agent.domain
+  mapperLocations: classpath:/mappers/oracle/**/*.xml
+  configuration:
+    lazyLoadingEnabled: true
+    mapUnderscoreToCamelCase: true
+    jdbcTypeForNull: varchar
+
+---
+spring:
+  profiles: mssql
+  
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:jtds:sqlserver://dev-app.ebiz4u.co.kr:1433/enioagent
+    username: enioagent
+    password: eniojjang
+    test-on-borrow: true
+    validation-query: SELECT 1
+      
+mybatis:
+  typeAliasesPackage: kr.co.inogard.enio.agent.domain
+  mapperLocations: classpath:/mappers/mssql/**/*.xml
+  configuration:
+    lazyLoadingEnabled: true
+    mapUnderscoreToCamelCase: true
+    jdbcTypeForNull: varchar

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.rfq.RfqItemMapper">
+  <sql id="sqlSelect">
+    SELECT ri.rfq_no, 
+           ri.item_seq, 
+           ri.pr_no, 
+           ri.pr_item_seq, 
+           ri.item_nm, 
+           ri.item_cd, 
+           ri.cls_cd, 
+           ri.size_nm, 
+           ri.model_nm, 
+           ri.dlv_loc, 
+           To_date(ri.dlv_req_ymd, 'YYYYMMDD') AS dlv_req_ymd, 
+           ri.mk_comp_nm, 
+           ri.unit_cd, 
+           ri.plan_unit_prc, 
+           ri.qty 
+    FROM   agt_rfqitem ri 
+  </sql>
+  
+  <select id="findAllByRfqNo" resultType="kr.co.inogard.enio.agent.domain.rfq.RfqItem">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  ri.rfq_no = #{rfqNo} 
+    ]]>
+  </select>
+  
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.rfq.RfqItem">
+		<![CDATA[
+		INSERT INTO agt_rfqitem (
+      rfq_no, 
+      item_seq, 
+      pr_no, 
+      pr_item_seq, 
+      item_nm, 
+      item_cd, 
+      cls_cd, 
+      size_nm, 
+      model_nm, 
+      mk_comp_nm, 
+      dlv_loc, 
+      dlv_req_ymd, 
+      unit_cd, 
+      plan_unit_prc, 
+      qty
+    ) VALUES (
+      #{rfqNo}, 
+      #{itemSeq}, 
+      #{prNo}, 
+      #{prItemSeq}, 
+      #{itemNm}, 
+      #{itemCd}, 
+      #{clsCd}, 
+      #{sizeNm}, 
+      #{modelNm}, 
+      #{mkCompNm}, 
+      #{dlvLoc}, 
+      To_char(#{dlvReqYmd}, 'YYYYMMDD'), 
+      #{unitCd}, 
+      #{planUnitPrc}, 
+      #{qty}
+    ) 
+  ]]>
+  </insert>
+</mapper>

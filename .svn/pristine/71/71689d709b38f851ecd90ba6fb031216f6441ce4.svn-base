@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.cus.CusMapper">
+	<select id="findByCusCd" parameterType="string" resultType="Customer">
+		<![CDATA[
+		SELECT 
+			A.CUS_CD,A.CUS_BSN_NO,A.CUS_NM,A.CEO_NM
+			,A.MAIN_TEL,A.MAIN_FAX,A.MAIN_EMAIL
+			,A.UPTAE_NM,A.UPJONG_NM
+			,A.ZIP_CD,A.ADDR1,A.ADDR2
+			,dbo.getStringToDateTime(A.REG_DT) AS REG_DT
+			,dbo.getStringToDateTime(A.E4U_IF_DT) AS E4U_IF_DT
+		FROM AGT_CUS A
+		WHERE A.CUS_CD=#{cusCd}		
+		]]>
+	</select>
+
+	
+	<update id="update" parameterType="Customer">
+		<![CDATA[
+		UPDATE AGT_CUS SET
+			CUS_NM=#{cusNm}
+			,CEO_NM=#{ceoNm}
+			,MAIN_TEL=#{mainTel}
+			,MAIN_FAX=#{mainFax}
+			,MAIN_EMAIL=#{mainEmail}
+			,UPTAE_NM=#{uptaeNm}
+			,UPJONG_NM=#{upjongNm}
+			,ZIP_CD=#{zipCd}
+			,ADDR1=#{addr1}
+			,ADDR2=#{addr2}
+			,E4U_IF_DT=CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '')
+		WHERE CUS_CD=#{cusCd}		
+		]]>
+	</update>
+	<insert id="add" parameterType="dept">
+		<![CDATA[
+		INSERT INTO AGT_CUS(CUS_CD,CUS_BSN_NO,CUS_NM,CEO_NM
+			,MAIN_TEL,MAIN_FAX,MAIN_EMAIL
+			,UPTAE_NM,UPJONG_NM
+			,ZIP_CD,ADDR1,ADDR2
+			,REG_DT
+			,E4U_IF_DT
+		)
+		SELECT 
+			#{cusCd},#{cusBsnNo},#{cusNm},#{ceoNm}
+			,#{mainTel},#{mainFax},#{mainEmail}
+			,#{uptaeNm},#{upjongNm}
+			,#{zipCd},#{addr1},#{addr2}
+			,CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '')
+			,CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '')
+        ]]>
+    </insert>
+
+	
+</mapper>

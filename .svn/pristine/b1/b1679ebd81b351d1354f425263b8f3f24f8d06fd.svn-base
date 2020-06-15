@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.user.UserDumMapper">
+	<insert id="add" parameterType="kr.co.inogard.enio.agent.domain.user.UserDum">
+		<selectKey resultType="string" keyProperty="erpUserCd" order="BEFORE">
+                <![CDATA[
+            	    SELECT B.agt_cd || A.seq AS erpUserCd 
+            	    FROM   (
+                            	      SELECT Substr(To_char(To_number('1' || Nvl(Max(Substr(I.erp_user_cd, 6, 5)), '00000') + 1)), 2, 5) AS SEQ 
+                            	        FROM agt_dum_user I
+                        	     ) A 
+            	    CROSS JOIN agt_agent B 
+                ]]>
+         </selectKey>
+                <![CDATA[
+            	    INSERT INTO agt_dum_user (
+                    	      erp_user_cd, 
+                    	      user_nm, 
+                    	      user_tel, 
+                    	      user_email, 
+                    	      erp_dept_cd, 
+                    	      user_sms, 
+                    	      reg_dt, 
+                    	      e4u_user_cd
+                  	 ) VALUES (
+                    	      #{erpUserCd}, 
+                    	      #{userNm}, 
+                    	      #{userTel}, 
+                    	      #{userEmail}, 
+                    	      #{erpDeptCd}, 
+                    	      #{userSms}, 
+                    	      To_char(SYSDATE, 'YYYYMMDDHH24MISS'), 
+                    	      NULL
+                  	 ) 
+                ]]>
+	</insert>
+
+  <select id="findByErpUserCd" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.user.UserDum">
+  <![CDATA[
+		SELECT A.erp_user_cd, 
+    		       A.user_nm, 
+    		       A.user_tel, 
+    		       A.user_email, 
+    		       A.erp_dept_cd, 
+    		       A.user_sms, 
+    		       To_date(A.reg_dt, 'YYYYMMDDHH24MISS') AS REG_DT, 
+    		       A.e4u_user_cd 
+		FROM  agt_dum_user A 
+	   WHERE A.erp_user_cd = #{erpUserCd} 
+  ]]>
+	</select>
+
+	<select id="findByUserNmAndUserEmail" parameterType="kr.co.inogard.enio.agent.domain.user.UserDum" resultType="kr.co.inogard.enio.agent.domain.user.UserDum">
+  <![CDATA[
+		SELECT A.erp_user_cd, 
+    		       A.user_nm, 
+    		       A.user_tel, 
+    		       A.user_email, 
+    		       A.erp_dept_cd, 
+    		       A.user_sms, 
+    		       To_date(A.reg_dt, 'YYYYMMDDHH24MISS') AS REG_DT, 
+    		       A.e4u_user_cd 
+		 FROM agt_dum_user A 
+		WHERE A.user_nm = #{userNm} 
+		    AND A.user_email = #{userEmail} 
+  ]]>
+	</select>
+
+	<select id="findAllNotSend" parameterType="hashmap" resultType="kr.co.inogard.enio.agent.domain.user.UserDum">
+  <![CDATA[
+		SELECT A.erp_user_cd, 
+    		        A.user_nm, 
+    		        A.user_tel, 
+    		        A.user_email, 
+    		        A.dept_cd, 
+    		        A.user_sms, 
+    		        A.reg_dt, 
+    		        A.e4u_user_cd 
+		  FROM agt_dum_user A 
+		WHERE A.e4u_user_cd IS NULL 
+  ]]>
+	</select>
+
+	<update id="updateE4uUserCd" parameterType="kr.co.inogard.enio.agent.domain.user.UserDum">
+  <![CDATA[
+		UPDATE agt_dum_user 
+		      SET e4u_user_cd = #{e4uUserCd}, 
+		            e4u_if_dt = To_char(SYSDATE, 'YYYYMMDDHH24MISS') 
+		WHERE erp_user_cd = #{erpUserCd} 
+  ]]>
+	</update>
+  <update id="updateE4uIfSt" parameterType="kr.co.inogard.enio.agent.domain.user.UserDum">
+  <![CDATA[
+        UPDATE agt_dum_user 
+    		  SET e4u_if_st = #{e4uIfSt},
+                    e4u_if_dt = To_char(SYSDATE, 'YYYYMMDDHH24MISS')
+    	 WHERE erp_user_cd = #{erpUserCd} 
+  ]]>
+  </update>	
+</mapper>

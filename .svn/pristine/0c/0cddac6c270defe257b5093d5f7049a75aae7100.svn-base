@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.event.EventMapper">
+  <sql id="sqlSelect">
+    SELECT  COUNT(*) OVER () filtered_count,
+            evt.evt_no,
+            evt.evt_io_type,
+            evt.evt_cmd_param,
+            evt.evt_st,
+            To_date(evt.reg_dt, 'YYYYMMDDHH24MISS') AS reg_dt,
+            evt.req_cntn,
+            evt.rslt_cd,
+            evt.rslt_msg,
+            evt.rcv_cntn,
+            To_date(evt.rcv_dt, 'YYYYMMDDHH24MISS') AS rcv_dt,
+            evt.agt_cd,
+            evt.sche_kind
+    FROM agt_event evt
+  </sql>
+
+  <select id="findByEvtNo" parameterType="string" resultType="cmmEvent">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  evt.evt_no = #{value} 
+    ]]>
+  </select>
+
+  <select id="findAll" resultType="cmmEvent">
+    SELECT *
+    FROM (
+      SELECT  ROWNUM AS RNUM,
+              A.*
+      FROM (
+        <include refid="sqlSelect"/>
+        <where>
+          <if test="search != null">
+            <if test="search.value != null and search.value != ''">
+            <![CDATA[
+              evt.evt_cmd_param like '%'||#{search.value}||'%'
+            ]]>
+            </if>
+            <if test="search.evtIoType != null and search.evtIoType != ''">
+            <![CDATA[
+              AND evt.evt_io_type = #{search.evtIoType}
+            ]]>
+            </if>
+            <if test="search.evtSt != null and search.evtSt != ''">
+            <![CDATA[
+              AND evt.evt_st = #{search.evtSt}
+            ]]>
+            </if>
+            <if test="search.agtCd != null and search.agtCd != ''">
+            <![CDATA[
+              AND evt.agt_cd = #{search.agtCd}
+            ]]>
+            </if>
+          </if>
+        </where>
+        <choose>
+          <when test="pageable != null and pageable.sort != null">
+            <foreach item="order" collection="pageable.sort" open="ORDER BY " separator=",">
+              ${order.property} ${order.direction}
+            </foreach>
+          </when>
+          <otherwise>
+            ORDER BY reg_dt desc
+          </otherwise>
+        </choose>
+      ) A
+      <if test="pageable != null">
+      <![CDATA[              
+        WHERE ROWNUM <= ((#{pageable.page} + 1) * #{pageable.size})
+      ]]>
+      </if>
+    )
+    <if test="pageable != null">
+    <![CDATA[
+      WHERE RNUM > (#{pageable.page} * #{pageable.size})
+    ]]>
+    </if>
+  </select>
+
+  <select id="count" resultType="long">
+  <![CDATA[
+    SELECT count(*)
+    FROM agt_event
+  ]]>
+  </select>
+
+  <insert id="add" parameterType="cmmEvent" useGeneratedKeys="false">
+    <selectKey resultType="cmmEvent" keyProperty="evtNo,agtCd" order="BEFORE">
+		<![CDATA[
+			SELECT B.agt_cd || To_char(SYSDATE, 'YYYYMMDD') || A.seq AS evtNo, 
+			       B.agt_cd AS agtCd 
+			FROM   (
+			  SELECT Substr(To_char(To_number('1' || Nvl(Max(Substr(I.evt_no, 14, 7)), '0000000') + 1)), 2, 7) AS SEQ 
+	      FROM   agt_event I 
+	             cross join agt_agent C 
+	      WHERE  I.evt_no LIKE C.agt_cd || To_char(SYSDATE, 'YYYYMMDD') || '%') A 
+	    cross join agt_agent B 
+    ]]>
+    </selectKey>
+    <![CDATA[
+			INSERT INTO agt_event (
+			  evt_no, 
+			  evt_io_type, 
+			  evt_cmd_param, 
+			  evt_st, 
+			  reg_dt, 
+			  req_cntn, 
+			  rslt_cd, 
+			  rslt_msg, 
+			  rcv_cntn, 
+			  rcv_dt, 
+			  agt_cd, 
+			  sche_kind
+	    ) VALUES (
+			 #{evtNo}, 
+       #{evtIoType}, 
+       #{evtCmdParam}, 
+       #{evtSt}, 
+       To_char(sysdate, 'YYYYMMDDHH24MISS'), 
+       #{reqCntn}, 
+       #{rsltCd}, 
+       #{rsltMsg}, 
+       #{rcvCntn}, 
+       NULL, 
+       #{agtCd}, 
+       #{scheKind} 
+			)
+    ]]>
+  </insert>
+
+  <update id="updateReq" parameterType="cmmEvent">
+    <![CDATA[
+			UPDATE agt_event 
+			SET    reg_dt = To_char(sysdate, 'YYYYMMDDHH24MISS'), 
+			       req_cntn = #{reqCntn} 
+			WHERE  evt_no = #{evtNo} 
+		]]>
+  </update>
+
+  <update id="updateRes" parameterType="cmmEvent">
+    <![CDATA[
+			UPDATE agt_event 
+			SET    rslt_cd = #{rsltCd}, 
+			       rslt_msg = #{rsltMsg}, 
+			       rcv_cntn = #{rcvCntn}, 
+			       rcv_dt = To_char(sysdate, 'YYYYMMDDHH24MISS'),
+             evt_st = #{evtSt}
+			WHERE  evt_no = #{evtNo} 
+		]]>
+  </update>
+</mapper>

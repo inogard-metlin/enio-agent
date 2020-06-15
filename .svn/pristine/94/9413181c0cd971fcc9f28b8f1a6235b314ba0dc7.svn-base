@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.pr.PrItemDumMapper">
+  <sql id="sqlSelect">
+  <![CDATA[
+		SELECT dpi.erp_pr_no, 
+		       dpi.item_seq, 
+		       dpi.item_nm, 
+		       di.e4u_item_cd as item_cd,
+		       dpi.erp_item_cd,
+		       dpi.cls_cd, 
+		       dpi.size_nm, 
+		       dpi.model_nm, 
+		       dpi.mk_comp_nm, 
+		       dpi.unit_cd, 
+		       dpi.qty, 
+		       dpi.plan_unit_prc, 
+		       dpi.dlv_loc, 
+		       To_date(dpi.dlv_req_ymd, 'YYYYMMDD') AS dlv_req_ymd 
+		FROM   agt_dum_pritem dpi
+		       LEFT JOIN agt_dum_item di ON( di.erp_item_cd = dpi.erp_item_cd ) 
+  ]]>
+  </sql>
+
+  <select id="findAllByErpPrNo" parameterType="string" resultType="PrItemDum">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+		  WHERE  dpi.erp_pr_no = #{value} 
+      ORDER BY dpi.item_seq
+    ]]>
+  </select>
+
+  <insert id="add" parameterType="PrItemDum">
+  <![CDATA[
+    INSERT INTO agt_dum_pritem (
+      erp_pr_no, 
+      item_seq, 
+      item_nm, 
+      erp_item_cd, 
+      cls_cd, 
+      size_nm, 
+      model_nm, 
+      unit_cd, 
+      qty, 
+      plan_unit_prc, 
+      mk_comp_nm, 
+      dlv_loc, 
+      dlv_req_ymd
+    ) VALUES (
+      #{erpPrNo}, 
+      #{itemSeq}, 
+      #{itemNm}, 
+      #{itemCd}, 
+      #{clsCd}, 
+      #{sizeNm}, 
+      #{modelNm}, 
+      #{unitCd}, 
+      #{qty}, 
+      #{planUnitPrc}, 
+      #{mkCompNm}, 
+      #{dlvLoc}, 
+      To_char( #{dlvReqYmd}, 'YYYYMMDD') 
+    )
+  ]]>
+  </insert>
+
+  <delete id="deleteByErpPrNo" parameterType="string">
+  <![CDATA[
+    DELETE FROM agt_dum_pritem 
+    WHERE erp_pr_no = #{value} 
+  ]]>
+  </delete>
+</mapper>

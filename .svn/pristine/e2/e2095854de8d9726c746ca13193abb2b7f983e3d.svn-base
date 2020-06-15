@@ -1,0 +1,65 @@
+logging:
+#  path: D:/tomatodev/enio-agent/logs               #덕성개발  
+    path: e:/enio/enio-agent/logs/
+
+
+enio:
+  file:
+#    temp-dir: D:/tomatodev/enio-agent/temps/      #덕성개발
+#    pds-dir: D:/tomatodev/enio-agent/pds/            #덕성개발
+    temp-dir: e:/enio/enio-agent/temps/
+    pds-dir: e:/enio/enio-agent/pds/
+  scheduled:
+    cron: 0 0/1 * * * ?
+
+---
+spring:
+  profiles: oracle
+
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@210.121.194.253:1521:orcl
+    username: enio
+    password: enio
+  devtools:
+    restart:
+      enabled: true
+            
+## 덕성 개발 ##
+#  datasource:
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@203.252.210.55:1525:DEVNDSU
+#    username: ebid
+#    password: ebid
+#  devtools:
+#    restart:
+#      enabled: true    
+
+mybatis:
+  typeAliasesPackage: kr.co.inogard.enio.agent.domain
+  mapperLocations: classpath:/mappers/oracle/**/*.xml
+  configuration:
+    lazyLoadingEnabled: true
+    mapUnderscoreToCamelCase: true
+    jdbcTypeForNull: varchar
+
+---
+spring:
+  profiles: mssql
+  
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:jtds:sqlserver://dev-app.ebiz4u.co.kr:1433/enioagent
+    username: enioagent
+    password: eniojjang
+  devtools:
+    restart:
+      enabled: true    
+      
+mybatis:
+  typeAliasesPackage: kr.co.inogard.enio.agent.domain
+  mapperLocations: classpath:/mappers/mssql/**/*.xml
+  configuration:
+    lazyLoadingEnabled: true
+    mapUnderscoreToCamelCase: true
+    jdbcTypeForNull: varchar

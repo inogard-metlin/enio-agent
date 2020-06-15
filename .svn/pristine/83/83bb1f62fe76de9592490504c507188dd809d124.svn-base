@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.dept.DeptMapper">
+	<insert id="add" parameterType="dept">
+  <![CDATA[
+		INSERT INTO agt_dept (
+		  dept_cd, 
+      dept_nm, 
+      dept_tel, 
+      reg_dt, 
+      e4u_if_dt, 
+      erp_dept_cd
+    ) 
+    SELECT e4u_dept_cd, 
+		       dept_nm, 
+		       dept_tel, 
+		       reg_dt, 
+		       e4u_if_dt, 
+		       erp_dept_cd 
+		FROM   agt_dum_dept A 
+		WHERE  A.erp_dept_cd = #{erpDeptCd} 
+  ]]>
+	</insert>
+	
+	<select id="findByDeptCd" parameterType="string" resultType="Dept">
+  <![CDATA[
+		SELECT A.dept_cd, 
+		       A.dept_nm, 
+		       dept_tel, 
+		       dbo.getStringToDateTime(A.reg_dt) AS REG_DT, 
+		       A.e4u_dept_cd 
+		FROM   agt_dept A 
+		WHERE  A.dept_cd = #{deptCd} 
+  ]]>
+	</select>
+	
+</mapper>

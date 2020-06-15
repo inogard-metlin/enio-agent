@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.quot.QuotFileMapper">
+  <sql id="sqlSelect">
+    SELECT qf.rfq_no, 
+           qf.quot_rev, 
+           qf.cus_cd, 
+           qf.file_seq, 
+           qf.file_no 
+    FROM   agt_quotfile qf 
+  </sql>
+  
+  <select id="findByRfqNoAndQuotRevAndCusCd" resultType="kr.co.inogard.enio.agent.domain.quot.QuotSrv">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  qf.rfq_no = #{rfqNo}
+      AND qf.quot_rev = #{quotRev}
+      AND qf.cus_cd = #{cusCd}
+    ]]>
+  </select>
+  
+  <insert id="addQuotFile" parameterType="kr.co.inogard.enio.agent.domain.quot.QuotFile">
+    <selectKey resultType="string" keyProperty="fileSeq" order="BEFORE">
+		<![CDATA[
+			SELECT Substr(To_char(To_number('1' || Nvl(Max(qf.file_seq), '00000') + 1)), 2, 5) AS fileSeq 
+      FROM   agt_quotfile qf 
+      WHERE  qf.rfq_no = #{rfqNo} 
+             AND qf.quot_rev = #{quotRev} 
+             AND qf.cus_cd = #{cusCd} 
+		]]>
+    </selectKey>
+		<![CDATA[
+		INSERT INTO agt_quotfile (
+      rfq_no, 
+      quot_rev, 
+      cus_cd, 
+      file_seq, 
+      file_no
+    ) VALUES (
+      #{rfqNo}, 
+      #{quotRev}, 
+      #{cusCd}, 
+      #{fileSeq}, 
+      #{fileNo}
+    ) 
+		]]>
+  </insert>
+
+ <delete id="delQuotFile" parameterType="string">
+  <![CDATA[      
+      DELETE agt_quotfile Where rfq_no = #{rfqNo} 
+  ]]>  
+  </delete>  
+</mapper>

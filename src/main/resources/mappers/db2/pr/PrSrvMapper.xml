@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.pr.PrSrvMapper">
+  <sql id="sqlSelect">
+  <![CDATA[
+    SELECT  ps.pr_no, 
+                 ps.item_seq, 
+                 ps.srv_seq, 
+                 ps.srv_nm, 
+                 ps.srv_cd, 
+                 ps.unit_cd, 
+                 ps.qty 
+    FROM agt_prservice ps
+  ]]> 
+  </sql>
+
+  <select id="findAllByPrNoAndItemSeq" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.pr.PrSrv">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE ps.pr_no = #{prNo} 
+          AND ps.item_seq = #{itemSeq} 
+    ]]>
+  </select>
+
+	<insert id="addFromDummy" parameterType="kr.co.inogard.enio.agent.domain.pr.PrSrv">
+  <![CDATA[
+        INSERT INTO agt_prservice (
+              pr_no, 
+              item_seq, 
+              srv_seq, 
+              srv_nm, 
+              srv_cd, 
+              unit_cd, 
+              qty
+        ) 
+        SELECT  dp.e4u_pr_no, 
+                     dps.item_seq, 
+                     dps.srv_seq, 
+                     dps.srv_nm, 
+                     dps.srv_cd, 
+                     dps.unit_cd, 
+                     dps.qty 
+        FROM agt_dum_pr dp 
+        INNER JOIN agt_dum_pritem dpi ON ( dpi.erp_pr_no = dp.erp_pr_no ) 
+        INNER JOIN agt_dum_prservice dps ON ( dps.erp_pr_no = dpi.erp_pr_no AND dps.item_seq = dps.item_seq ) 
+       WHERE  dp.erp_pr_no = #{erpPrNo}  
+	]]>
+	</insert>
+	
+	<insert id="addByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.PrSrv">
+          <![CDATA[
+        		INSERT INTO agt_prservice (
+                      pr_no, 
+                      item_seq, 
+                      srv_seq, 
+                      srv_nm, 
+                      srv_cd, 
+                      unit_cd, 
+                      qty
+                 ) VALUES (
+                      #{prNo}, 
+                      #{itemSeq}, 
+                      #{srvSeq}, 
+                      #{srvNm}, 
+                      '9999', 
+                      'SET', 
+                      1
+                 ) 
+          ]]>
+	</insert>
+</mapper>

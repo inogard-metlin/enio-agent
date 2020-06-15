@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+  namespace="kr.co.inogard.enio.agent.mappers.dept.DeptDumMapper">
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+    <selectKey resultType="string" keyProperty="erpDeptCd"
+      order="BEFORE">
+    <![CDATA[
+      SELECT B.agt_cd + A.seq AS erpDeptCd 
+      FROM   (
+        SELECT RIGHT('00000' + CONVERT(VARCHAR, ISNULL(MAX(SUBSTRING(I.ERP_DEPT_CD, 6, 5)), '00000') + 1), 5) AS SEQ 
+        FROM   agt_dum_dept I
+      ) A 
+      cross join agt_agent B
+      WHERE B.agt_cd = #{agtCd} 
+    ]]>
+    </selectKey>
+    <![CDATA[
+      INSERT INTO agt_dum_dept (
+        erp_dept_cd, 
+        dept_nm, 
+        dept_tel, 
+        reg_dt, 
+        e4u_if_dt, 
+        e4u_dept_cd
+      ) VALUES (
+        #{erpDeptCd}, 
+        #{deptNm}, 
+        #{deptTel}, 
+        CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', ''), 
+        NULL, 
+        NULL 
+      )
+    ]]>
+  </insert>
+
+  <select id="findByErpDeptCd" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+  <![CDATA[
+		SELECT A.erp_dept_cd, 
+		       A.dept_nm, 
+		       dept_tel, 
+		       dbo.getStringToDateTime(A.reg_dt) AS REG_DT, 
+		       dbo.getStringToDateTime(A.e4u_if_dt) AS E4U_IF_DT, 
+		       A.e4u_dept_cd 
+		FROM   agt_dum_dept A 
+		WHERE  A.erp_dept_cd = #{erpDeptCd} 
+  ]]>
+  </select>
+
+  <select id="findByDeptNm" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+  <![CDATA[
+		SELECT A.erp_dept_cd, 
+		       A.dept_nm, 
+		       dept_tel, 
+		       dbo.getStringToDateTime(A.reg_dt) AS REG_DT, 
+		       dbo.getStringToDateTime(A.e4u_if_dt) AS E4U_IF_DT, 
+		       A.e4u_dept_cd 
+		FROM   agt_dum_dept A 
+		WHERE  A.dept_nm = #{deptNm}
+           AND A.erp_dept_cd LIKE #{agtCd} || '%' 
+  ]]>
+  </select>
+
+  <select id="findAllNotSend" parameterType="hashmap" resultType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+  <![CDATA[
+		SELECT A.erp_dept_cd, 
+		       A.dept_nm, 
+		       dept_tel, 
+		       dbo.getStringToDateTime(A.reg_dt) AS REG_DT,  
+		       A.e4u_if_dt, 
+		       A.e4u_dept_cd 
+		FROM   agt_dum_dept A 
+		WHERE  A.e4u_dept_cd IS NULL 
+  ]]>
+  </select>
+
+  <update id="updateE4uDeptCd" parameterType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+  <![CDATA[
+		UPDATE agt_dum_dept 
+		SET    e4u_dept_cd = #{e4uDeptCd}, 
+		       e4u_if_dt = CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '') 
+		WHERE  erp_dept_cd = #{erpDeptCd} 
+  ]]>
+  </update>
+  <update id="updateE4uIfSt" parameterType="kr.co.inogard.enio.agent.domain.dept.DeptDum">
+  <![CDATA[
+    UPDATE agt_dum_dept 
+		SET    e4u_if_st = #{e4uIfSt}
+               , e4u_if_dt = CONVERT(CHAR(8), GETDATE(), 112) + REPLACE(CONVERT(CHAR(8), GETDATE(), 114), ':', '')
+	WHERE  erp_dept_cd = #{erpDeptCd} 
+  ]]>
+  </update>
+</mapper>

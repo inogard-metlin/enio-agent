@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@172.16.25.73:1521:TISD
+    username: EBID
+    password: EBID1027
+    test-on-borrow: true
+    validation-query: SELECT 1 FROM dual
+
+logging:
+  path: /data1/webdev2/ebid/enio-agent/logs/
+
+enio:
+  file:
+    temp-dir: /data1/webdev2/ebid/enio-agent/temp/
+    pds-dir: /data1/webdev2/appnas/tis/ADMI/AAPA/EBID/
+  scheduled:
+    cron: 0 0/2 * * * ?

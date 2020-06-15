@@ -1,0 +1,135 @@
+package kr.co.inogard.enio.agent.service.po;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import kr.co.inogard.enio.agent.commons.util.Utils;
+import kr.co.inogard.enio.agent.domain.po.Po;
+import kr.co.inogard.enio.agent.domain.po.PoDto;
+import kr.co.inogard.enio.agent.domain.po.PoFile;
+import kr.co.inogard.enio.agent.domain.po.PoItem;
+import kr.co.inogard.enio.agent.domain.po.PoSrv;
+import kr.co.inogard.enio.agent.mappers.po.PoFileMapper;
+import kr.co.inogard.enio.agent.mappers.po.PoItemMapper;
+import kr.co.inogard.enio.agent.mappers.po.PoMapper;
+import kr.co.inogard.enio.agent.mappers.po.PoSrvMapper;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+@Transactional
+public class PoService {
+
+  @Autowired
+  private PoMapper poMapper;
+
+  @Autowired
+  private PoItemMapper poItemMapper;
+
+  @Autowired
+  private PoSrvMapper poSrvMapper;
+
+  @Autowired
+  private PoFileMapper poFileMapper;
+
+  @Autowired
+  private ModelMapper modelMapper;
+
+  public Po create(PoDto.Create poDto) {
+    Po po = modelMapper.map(poDto, Po.class);
+    poMapper.add(po);
+
+    List<PoFile> createPoFileList =
+        modelMapper.map(poDto.getPoFile(), new TypeToken<List<PoFile>>() {}.getType());
+    for (PoFile poFile : createPoFileList) {
+      poFileMapper.add(poFile);
+    }
+
+    List<PoItem> createPoItemList =
+        modelMapper.map(poDto.getPoItem(), new TypeToken<List<PoItem>>() {}.getType());
+    List<PoSrv> createPoSrvList = null;
+    for (PoItem xPoItem : createPoItemList) {
+      poItemMapper.add(xPoItem);
+
+      createPoSrvList =
+          modelMapper.map(xPoItem.getSrvList(), new TypeToken<List<PoSrv>>() {}.getType());
+      for (PoSrv xPoSrv : createPoSrvList) {
+        poSrvMapper.add(xPoSrv);
+      }
+    }
+    poMapper.updatePoNoInPrItem(po.getPoNo());
+    try {
+      this.updateCallSyncToErp(po.getPoNo(), "PO_END");
+    } catch (Exception e) {
+      log.error("ERP동기화(po_no=" + po.getPoNo() + ",PO_END):작업오류발생", e);
+    }
+
+    return po;
+  }
+
+  public void updateCallSyncToErp(String poNo, String notiKind) {
+    Map<String, String> info = new HashMap<String, String>();
+    info.put("poNo", poNo);
+    info.put("notiKind", notiKind);
+    poMapper.updateCallSyncToErp(info);
+  }
+
+  public DataTablesOutput<PoDto.Response> getAllPo(PoDto.Search search, DataTablesInput input) {
+    DataTablesOutput<PoDto.Response> output = new DataTablesOutput<PoDto.Response>();
+    output.setDraw(input.getDraw());
+
+    try {
+      search.setValue(input.getSearch().getValue());
+      List<Po> poList = poMapper.findAll(search, Utils.dataTablesInputToPageable(input));
+      List<PoDto.Response> data =
+          modelMapper.map(poList, new TypeToken<List<PoDto.Response>>() {}.getType());
+
+      output.setData(data);
+      output.setRecordsFiltered(
+          CollectionUtils.isEmpty(poList) ? 0 : poList.get(0).getFilteredCount());
+      output.setRecordsTotal(poMapper.count());
+    } catch (Exception e) {
+      output.setError(e.getMessage());
+      log.error(e.getMessage(), e);
+    }
+    return output;
+  }
+
+  public Page<Po> getAllPo(PoDto.Search search, Pageable pageable) {
+    List<Po> pr = poMapper.findAll(search, pageable);
+    return new PageImpl<Po>(pr, pageable,
+        CollectionUtils.isEmpty(pr) ? 0 : pr.get(0).getFilteredCount());
+  }
+
+  public Po getPo(String poNo) {
+    return poMapper.findByPoNo(poNo);
+  }
+
+  public List<PoItem> getPoItems(String poNo) {
+    return poItemMapper.findAllByPoNo(poNo);
+  }
+
+  public List<PoSrv> getPoServices(String poNo, String itemSeq) {
+    return poSrvMapper.findAllByPoNoAndItemSeq(poNo, itemSeq);
+  }
+
+  public List<PoFile> getPoFiles(String poNo) {
+    return poFileMapper.findAllByPoNo(poNo);
+  }
+
+  public PoFile getPoFile(String poNo, String fileSeq) {
+    return poFileMapper.findByPoNoAndFileSeq(poNo, fileSeq);
+  }
+
+}

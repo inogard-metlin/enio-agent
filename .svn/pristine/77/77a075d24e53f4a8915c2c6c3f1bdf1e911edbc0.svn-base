@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.item.ItemDumMapper">
+  <sql id="sqlSelect">
+    SELECT  COUNT(*) OVER () filtered_count, 
+            di.erp_item_cd, 
+            di.item_nm, 
+            di.size_nm, 
+            di.model_nm, 
+            di.unit_cd, 
+            di.mk_comp_nm, 
+            To_date(di.reg_dt, 'YYYYMMDDHH24MISS') AS reg_dt, 
+            di.use_yn, 
+            di.cls_cd, 
+            To_date(di.e4u_if_dt, 'YYYYMMDDHH24MISS') AS e4u_if_dt, 
+            di.e4u_if_st, 
+            di.e4u_item_cd 
+    FROM   agt_dum_item di 
+  </sql>
+
+  <select id="findByErpItemCd" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  di.erp_item_cd = #{value}
+    ]]>
+  </select>
+
+  <select id="findAllNotSend" resultType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  di.e4u_item_cd IS NULL
+      AND di.e4u_if_st = 'SR'
+    ]]>
+  </select>
+
+  <select id="findAll" resultType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+    SELECT *
+    FROM (
+      SELECT  ROWNUM AS RNUM,
+              A.*
+      FROM (
+        <include refid="sqlSelect"/>
+        <where>
+          <if test="search != null">
+            <if test="search.value != null and search.value != ''">
+            <![CDATA[
+            (
+              di.erp_item_cd like '%'||#{search.value}||'%'
+              or di.item_nm like '%'||#{search.value}||'%'
+              or di.size_nm like '%'||#{search.value}||'%'
+              or di.model_nm like '%'||#{search.value}||'%'
+              or di.unit_cd like '%'||#{search.value}||'%'
+              or di.mk_comp_nm like '%'||#{search.value}||'%'
+              or di.e4u_item_cd like '%'||#{search.value}||'%'
+            )
+            ]]>
+            </if>
+            <if test="search.e4uIfSt != null and search.e4uIfSt != ''">
+            <![CDATA[
+              AND di.e4u_if_st = #{search.e4uIfSt}
+            ]]>
+            </if>
+          </if>
+        </where>
+        
+        <choose>
+          <when test="pageable != null and pageable.sort != null">
+            <foreach item="order" collection="pageable.sort" open="ORDER BY " separator=",">
+              ${order.property} ${order.direction}
+            </foreach>
+          </when>
+          <otherwise>
+            ORDER BY reg_dt desc
+          </otherwise>
+        </choose>
+      ) A
+      <if test="pageable != null">
+      <![CDATA[              
+        WHERE ROWNUM <= ((#{pageable.page} + 1) * #{pageable.size})
+      ]]>
+      </if>
+    )
+    <if test="pageable != null">
+    <![CDATA[
+      WHERE RNUM > (#{pageable.page} * #{pageable.size})
+    ]]>
+    </if>
+  </select>
+
+  <select id="count" resultType="long">
+  <![CDATA[
+    SELECT count(*)
+    FROM agt_dum_item
+  ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+  <![CDATA[
+    INSERT INTO agt_dum_item(
+      erp_item_cd, 
+      item_nm, 
+      size_nm, 
+      model_nm, 
+      unit_cd, 
+      mk_comp_nm, 
+      reg_dt, 
+      use_yn, 
+      cls_cd, 
+      e4u_if_dt, 
+      e4u_item_cd
+    ) VALUES (
+      #{erpItemCd}, 
+      #{itemNm}, 
+      #{sizeNm}, 
+      #{modelNm}, 
+      #{unitCd}, 
+      #{mkCompNm}, 
+      To_char(sysdate, 'YYYYMMDDHH24MISS'), 
+      #{useYn}, 
+      #{clsCd}, 
+      NULL, 
+      NULL 
+    )
+  ]]>
+  </insert>
+
+  <update id="updateE4uItemCd" parameterType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+  <![CDATA[
+    UPDATE agt_dum_item 
+		SET    e4u_if_dt = To_char(sysdate, 'YYYYMMDDHH24MISS'), 
+		       e4u_item_cd = #{e4uItemCd} 
+		WHERE  erp_item_cd = #{erpItemCd} 
+  ]]>
+  </update>
+
+  <update id="updateE4uIfSt" parameterType="kr.co.inogard.enio.agent.domain.item.ItemDum">
+  <![CDATA[
+    UPDATE agt_dum_item 
+    SET    e4u_if_st = #{e4uIfSt}, 
+           e4u_if_dt = To_char(sysdate, 'YYYYMMDDHH24MISS') 
+    WHERE  erp_item_cd = #{erpItemCd} 
+  ]]>
+  </update>
+</mapper>

@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@192.168.0.213:1521:EBIZSRV
+    username: kni
+    password: kni
+  devtools:
+    restart:
+      enabled: true    
+     
+    
+logging:
+  path: D:/developer/var/enio/enio-agent/logs/
+  
+enio:
+  file:
+    temp-dir: D:/developer/var/enio/enio-agent/temp/
+    pds-dir: D:/developer/var/enio/enio-agent/pds/
+  scheduled:
+    cron: 0 0 12 * * ?

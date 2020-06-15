@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.pr.PrItemMapper">
+  <sql id="sqlSelect">
+    SELECT  pi.pr_no, 
+                 pi.item_seq, 
+                 pi.item_nm, 
+                 pi.item_cd, 
+                 pi.cls_cd, 
+                 pi.size_nm, 
+                 pi.model_nm, 
+                 pi.dlv_loc, 
+                 To_date(pi.dlv_req_ymd, 'YYYYMMDD') AS dlv_req_ymd, 
+                 pi.mk_comp_nm, 
+                 pi.unit_cd, 
+                 pi.qty, 
+                 pi.plan_unit_prc, 
+                 pi.rfq_no, 
+                 pi.po_no, 
+                 pi.item_st 
+    FROM    agt_pritem pi
+  </sql>
+
+  <select id="findAllByPrNo" resultType="kr.co.inogard.enio.agent.domain.pr.PrItem">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  pi.pr_no = #{prNo} 
+    ]]>
+  </select>
+
+  <insert id="addFromDummy" parameterType="kr.co.inogard.enio.agent.domain.pr.PrItem">
+  <![CDATA[
+    INSERT INTO agt_pritem (
+                pr_no, 
+                item_seq, 
+                item_nm, 
+                item_cd, 
+                cls_cd, 
+                size_nm, 
+                model_nm, 
+                unit_cd, 
+                qty, 
+                plan_unit_prc, 
+                rfq_no, 
+                po_no, 
+                mk_comp_nm, 
+                item_st, 
+                dlv_loc, 
+                dlv_req_ymd
+        ) 
+		SELECT  dp.e4u_pr_no, 
+                     dpi.item_seq, 
+                     dpi.item_nm, 
+                     i.item_cd, 
+                     '999999', 
+                     dpi.size_nm, 
+                     dpi.model_nm, 
+                     dpi.unit_cd, 
+                     dpi.qty, 
+                     dpi.plan_unit_prc, 
+                     NULL, 
+                     NULL, 
+                     dpi.mk_comp_nm, 
+                     '00', 
+                     dpi.dlv_loc, 
+                     dpi.dlv_req_ymd 
+         FROM   agt_dum_pr dp 
+         INNER JOIN agt_dum_pritem dpi ON ( dpi.erp_pr_no = dp.erp_pr_no ) 
+         LEFT JOIN agt_item i ON ( i.erp_item_cd = dpi.erp_item_cd ) 
+		WHERE  dp.erp_pr_no = #{erpPrNo} 
+  ]]>
+  </insert>
+
+  <insert id="addByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.PrItem">
+        <![CDATA[
+      		INSERT INTO agt_pritem (
+                      pr_no, 
+                      item_seq, 
+                      item_nm, 
+                      item_cd, 
+                      cls_cd, 
+                      size_nm, 
+                      model_nm, 
+                      unit_cd, 
+                      qty, 
+                      plan_unit_prc, 
+                      rfq_no, 
+                      po_no, 
+                      mk_comp_nm, 
+                      item_st, 
+                      dlv_loc, 
+                      dlv_req_ymd
+              ) VALUES (
+                      #{prNo}, 
+                      #{itemSeq}, 
+                      #{itemNm}, 
+                      #{itemCd}, 
+                      '999999', 
+                      #{sizeNm}, 
+                      #{modelNm}, 
+                      #{unitCd}, 
+                      #{qty}, 
+                      #{planUnitPrc}, 
+                      NULL, 
+                      NULL, 
+                      #{mkCompNm}, 
+                      '00', 
+                      #{dlvLoc}, 
+                      To_char( #{dlvReqYmd}, 'YYYYMMDD')
+                ) 
+        ]]>
+  </insert>
+
+  <update id="updateItemCdByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.PrItem">
+    	<![CDATA[
+    		UPDATE agt_pritem 
+    		      SET item_cd = (SELECT I.item_cd 
+    		                              FROM agt_item I 
+    		                             WHERE I.e4u_item_cd = #{itemCd}) 
+    		WHERE pr_no = #{prNo} 
+    		    AND item_seq = #{itemSeq} 
+        ]]>
+  </update>
+</mapper>
