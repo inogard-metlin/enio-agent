@@ -1,1 +1,0 @@
-UPDATE agt_dum_pr SET cncl_flag = 'CR', cncl_req_dt = To_char(sysdate, 'YYYYMMDDHH24MISS') WHERE erp_pr_no = 'ERPPR2017090900001'; 
