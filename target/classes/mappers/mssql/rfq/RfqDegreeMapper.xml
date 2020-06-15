@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.rfq.RfqDegreeMapper">
+  <sql id="sqlSelect">
+    SELECT rd.rfq_no, 
+           rd.quot_rev, 
+           rd.bid_start_dt, 
+           rd.bid_expire_dt, 
+           rd.bid_open_dt, 
+           rd.rebid_rmrk 
+    FROM   agt_rfqdegree rd 
+  </sql>
+
+  <select id="findAllByRfqNo" resultType="kr.co.inogard.enio.agent.domain.rfq.RfqDegree">
+    <include refid="sqlSelect" />
+    <![CDATA[
+      WHERE  rd.rfq_no = #{rfqNo} 
+    ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.rfq.RfqDegree">
+  <![CDATA[
+    INSERT INTO agt_rfqdegree (
+      rfq_no, 
+      quot_rev, 
+      bid_start_dt, 
+      bid_expire_dt, 
+      bid_open_dt, 
+      rebid_rmrk
+    ) VALUES (
+      #{rfqNo}, 
+      #{quotRev}, 
+      CONVERT(CHAR(8), #{bidStartDt}, 112) + REPLACE(CONVERT(CHAR(8), #{bidStartDt}, 114), ':', ''), 
+      CONVERT(CHAR(8), #{bidExpireDt}, 112) + REPLACE(CONVERT(CHAR(8), #{bidExpireDt}, 114), ':', ''), 
+      CONVERT(CHAR(8), #{bidOpenDt}, 112) + REPLACE(CONVERT(CHAR(8), #{bidOpenDt}, 114), ':', ''), 
+      #{rebidRmrk}
+    )      
+  ]]>
+  </insert>
+  
+ <delete id="delRfqdegree" parameterType="string">
+  <![CDATA[      
+      DELETE agt_rfqdegree Where rfq_no = #{rfqNo} 
+  ]]>  
+  </delete>  
+</mapper>

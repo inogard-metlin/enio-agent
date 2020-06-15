@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.rfq.RfqSrvMapper">
+  <sql id="sqlSelect">
+    SELECT rs.rfq_no, 
+           rs.item_seq, 
+           rs.srv_seq, 
+           rs.pr_no, 
+           rs.pr_item_seq, 
+           rs.pr_srv_seq, 
+           rs.srv_nm, 
+           rs.srv_cd, 
+           rs.unit_cd, 
+           rs.qty 
+    FROM   agt_rfqservice rs
+  </sql>
+
+  <select id="findAllByRfqNoAndItemSeq" resultType="kr.co.inogard.enio.agent.domain.rfq.RfqSrv">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE rs.rfq_no = #{rfqNo}
+      AND rs.item_seq = #{itemSeq}
+    ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.rfq.RfqSrv">
+  <![CDATA[
+		INSERT INTO agt_rfqservice (
+      rfq_no, 
+      item_seq, 
+      srv_seq, 
+      pr_no, 
+      pr_item_seq, 
+      pr_srv_seq, 
+      srv_nm, 
+      srv_cd, 
+      unit_cd, 
+      qty
+    ) VALUES (
+      #{rfqNo}, 
+      #{itemSeq}, 
+      #{srvSeq}, 
+      #{prNo}, 
+      #{prItemSeq}, 
+      #{prSrvSeq}, 
+      #{srvNm}, 
+      #{srvCd}, 
+      #{unitCd}, 
+      #{qty} 
+    ) 
+  ]]>
+  </insert>
+
+  <delete id="delRfqService" parameterType="string">
+  <![CDATA[      
+      DELETE agt_rfqservice Where rfq_no = #{rfqNo} 
+  ]]>  
+  </delete>
+</mapper>

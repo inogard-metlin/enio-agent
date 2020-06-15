@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.po.PoItemMapper">
+  <sql id="sqlSelect">
+    SELECT pi.po_no, 
+           pi.item_seq, 
+           pi.pr_no, 
+           pi.pr_item_seq, 
+           pi.item_nm, 
+           pi.item_cd, 
+           pi.cls_cd, 
+           pi.size_nm, 
+           pi.model_nm, 
+           pi.dlv_loc, 
+           dbo.getStringToDateTime(pi.dlv_req_ymd) AS dlv_req_ymd,
+           pi.mk_comp_nm, 
+           pi.unit_cd, 
+           pi.qty, 
+           pi.unit_prc, 
+           pi.amt 
+    FROM   agt_poitem pi 
+  </sql>
+  
+  <select id="findAllByPoNo" resultType="kr.co.inogard.enio.agent.domain.po.PoItem">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE  pi.po_no = #{poNo}
+    ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.po.PoItem">
+  <![CDATA[
+		INSERT INTO agt_poitem (
+      po_no, 
+      item_seq, 
+      pr_no, 
+      pr_item_seq, 
+      item_nm, 
+      item_cd, 
+      cls_cd, 
+      size_nm, 
+      model_nm, 
+      mk_comp_nm, 
+      dlv_loc, 
+      dlv_req_ymd, 
+      unit_cd, 
+      qty, 
+      unit_prc, 
+      amt
+    ) VALUES (
+      #{poNo}, 
+      #{itemSeq}, 
+      #{prNo}, 
+      #{prItemSeq}, 
+      #{itemNm}, 
+      #{itemCd}, 
+      #{clsCd}, 
+      #{sizeNm}, 
+      #{modelNm}, 
+      #{mkCompNm}, 
+      #{dlvLoc}, 
+      CONVERT(CHAR(8), #{dlvReqYmd}, 112), 
+      #{unitCd}, 
+      #{qty}, 
+      #{unitPrc}, 
+      #{amt} 
+    ) 
+  ]]>
+  </insert>
+
+  <delete id="delPoItem" parameterType="string">
+  <![CDATA[      
+      DELETE agt_poitem Where po_no = #{poNo} 
+  ]]>  
+  </delete> 
+</mapper>

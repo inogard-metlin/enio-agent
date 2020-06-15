@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.pr.PrFileMapper">
+  <sql id="sqlSelect">
+  <![CDATA[
+    SELECT pf.pr_no, 
+           pf.file_seq, 
+           pf.file_no, 
+           f.cli_file_nm, 
+           f.svr_file_nm, 
+           f.svr_file_path, 
+           To_date(f.reg_dt, 'YYYYMMDDHH24MISS') as reg_dt 
+    FROM   agt_prfile pf
+      JOIN agt_file f ON( pf.file_no = f.file_no )  
+  ]]>
+  </sql>
+
+  <select id="findAllByPrNo" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.pr.PrFile">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE pf.pr_no = #{value} 
+    ]]>
+  </select>
+  
+  <select id="findByPrNoAndFileSeq" parameterType="string" resultType="kr.co.inogard.enio.agent.domain.pr.PrFile">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE pf.pr_no = #{prNo}
+      AND pf.file_seq = #{fileSeq} 
+    ]]>
+  </select>
+
+  <insert id="addFromDummy" parameterType="kr.co.inogard.enio.agent.domain.pr.PrFile">
+  <![CDATA[
+      INSERT INTO agt_prfile (
+        pr_no, 
+        file_seq, 
+        file_no
+      )
+      SELECT dp.e4u_pr_no, 
+			       dpf.file_seq,
+			       #{fileNo} 
+			FROM   agt_dum_pr dp 
+			       LEFT JOIN agt_dum_prfile dpf 
+			              ON ( dpf.erp_pr_no = dp.erp_pr_no ) 
+			WHERE  dp.erp_pr_no = #{erpPrNo}  
+  ]]>
+  </insert>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.pr.PrFile">
+    <selectKey resultType="PrFile" keyProperty="fileSeq" order="BEFORE">
+		<![CDATA[
+			SELECT Substr(To_char(To_number('1' || Nvl(Max(I.file_seq), '00000') + 1)), 2, 5) AS fileSeq 
+			FROM   agt_prfile I 
+			WHERE  I.pr_no = #{prNo} 
+    ]]>
+    </selectKey>
+    <![CDATA[
+      INSERT INTO agt_prfile (
+        pr_no, 
+        file_seq, 
+        file_no
+      ) VALUES ( 
+        #{prNo}, 
+        #{fileSeq}, 
+        #{fileNo} 
+      ) 
+		]]>
+  </insert>
+</mapper>

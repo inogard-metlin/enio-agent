@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.inogard.enio.agent.mappers.quot.QuotMapper">
+  <sql id="sqlSelect">
+    SELECT q.rfq_no, 
+               q.quot_rev, 
+               q.cus_cd, 
+               q.amt, 
+               q.vat_amt, 
+               q.tax_typecd, 
+               q.crcy_cd, 
+               q.crcy_rate, 
+               To_date(q.quot_sbmt_dt, 'YYYYMMDDHH24MISS') AS quot_sbmt_dt, 
+               To_date(q.e4u_if_dt, 'YYYYMMDDHH24MISS') AS e4u_if_dt,
+               rc.rslt_yn,
+               c.cus_nm,
+               c.ceo_nm
+     FROM agt_quot q
+     JOIN agt_rfqcus rc ON (rc.rfq_no = q.rfq_no AND rc.cus_cd = q.cus_cd)
+     JOIN agt_cus c ON (c.cus_cd = q.cus_cd)
+  </sql>
+  
+  <select id="findAllByRfqNoAndQuotRev" resultType="kr.co.inogard.enio.agent.domain.quot.Quot">
+    <include refid="sqlSelect" />
+    <![CDATA[
+      WHERE q.rfq_no = #{rfqNo}
+          AND q.quot_rev = #{quotRev} 
+    ]]>
+      ORDER BY rc.rslt_yn DESC
+  </select>
+  
+  <select id="findByRfqNoAndQuotRevAndCusCd" resultType="kr.co.inogard.enio.agent.domain.quot.Quot">
+    <include refid="sqlSelect"/>
+    <![CDATA[
+      WHERE q.rfq_no = #{rfqNo}
+          AND q.quot_rev = #{quotRev}
+          AND q.cus_cd = #{cusCd}
+    ]]>
+  </select>
+
+  <insert id="add" parameterType="kr.co.inogard.enio.agent.domain.quot.Quot">
+        <![CDATA[
+      		INSERT INTO agt_quot (
+                  rfq_no, 
+                  quot_rev, 
+                  cus_cd, 
+                  amt, 
+                  vat_amt, 
+                  tax_typecd, 
+                  crcy_cd, 
+                  crcy_rate, 
+                  quot_sbmt_dt, 
+                  e4u_if_dt
+            ) VALUES (
+                  #{rfqNo}, 
+                  #{quotRev}, 
+                  #{cusCd}, 
+                  #{amt}, 
+                  #{vatAmt}, 
+                  #{taxTypeCd}, 
+                  #{crcyCd}, 
+                  #{crcyRate}, 
+                  To_char(#{quotSbmtDt}, 'yyyyMMddHH24Miss'), 
+                  To_char(SYSDATE, 'yyyyMMddHH24Miss')
+            ) 
+        ]]>
+  </insert>
+  
+  <delete id="delQuot" parameterType="string">
+  <![CDATA[      
+      DELETE agt_quot Where rfq_no = #{rfqNo} 
+  ]]>  
+  </delete>    
+</mapper>
