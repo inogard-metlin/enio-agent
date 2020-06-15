@@ -5,7 +5,7 @@
 # *.text
 # *.exe
 # *.zip
-.gitignore
+*.gitignore
 
 ## 폴더 무시 - 기억하자   
 .svn/
