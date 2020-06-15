@@ -10,8 +10,8 @@ spring:
       prefix: /WEB-INF/views/
       suffix: .jsp
 
-#  profiles:
-#    active: dev,oracle,D0001 
+  profiles:
+    active: local,oracle,C0001 
     
 endpoints:
   jmx:
