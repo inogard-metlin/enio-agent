@@ -5,8 +5,11 @@
 # *.text
 # *.exe
 # *.zip
-*.gitignore
+.classpath
+.factorypath
+.project
 
 ## 폴더 무시 - 기억하자   
+.settings
 .svn/
 target/
