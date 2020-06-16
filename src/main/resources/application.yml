@@ -1,5 +1,5 @@
 server:
-  port: 17071
+#  port: 17071
   error:
     whitelabel:
       enabled: false
