@@ -1,5 +1,5 @@
 server:
-  port: 17071
+#  port: 17071
   error:
     whitelabel:
       enabled: false
@@ -10,8 +10,8 @@ spring:
       prefix: /WEB-INF/views/
       suffix: .jsp
 
-  profiles:
-    active: local,oracle,C0001 
+#  profiles:
+#    active: local,oracle,C0001 
     
 endpoints:
   jmx:
