@@ -61,7 +61,7 @@ spring:
     password: eniojjang
   devtools:
     restart:
-      enabled: true    
+      enabled: true
 
  # 울산대학교 개발 ##       
 #  datasource:
@@ -71,7 +71,7 @@ spring:
 #    password: enio_0101!
 #  devtools:
 #    restart:
-#      enabled: true    
+#      enabled: true
       
 mybatis:
   typeAliasesPackage: kr.co.inogard.enio.agent.domain
