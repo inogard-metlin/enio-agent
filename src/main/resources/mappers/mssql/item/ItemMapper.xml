@@ -45,17 +45,17 @@
         <include refid="sqlSelect"/>
         <where>
           <if test="search != null">
-            item_cd like #{search.agtCd} || '%'
+            item_cd like #{search.agtCd} + '%'
             <if test="search.value != null and search.value != ''">
             <![CDATA[
             AND (
-              i.erp_item_cd like '%'||#{search.value}||'%'
-              or i.item_nm like '%'||#{search.value}||'%'
-              or i.size_nm like '%'||#{search.value}||'%'
-              or i.model_nm like '%'||#{search.value}||'%'
-              or i.unit_cd like '%'||#{search.value}||'%'
-              or i.mk_comp_nm like '%'||#{search.value}||'%'
-              or i.e4u_item_cd like '%'||#{search.value}||'%'
+              i.erp_item_cd like '%'+#{search.value}+'%'
+              or i.item_nm like '%'+#{search.value}+'%'
+              or i.size_nm like '%'+#{search.value}+'%'
+              or i.model_nm like '%'+#{search.value}+'%'
+              or i.unit_cd like '%'+#{search.value}+'%'
+              or i.mk_comp_nm like '%'+#{search.value}+'%'
+              or i.e4u_item_cd like '%'+#{search.value}+'%'
             )
             ]]>
             </if>
@@ -74,7 +74,7 @@
   <![CDATA[
     SELECT count(*)
     FROM agt_item
-    WHERE item_cd like #{agtCd} || '%'
+    WHERE item_cd like #{agtCd} + '%'
   ]]>
   </select>
 

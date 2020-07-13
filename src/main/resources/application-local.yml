@@ -5,7 +5,7 @@ spring:
 
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@192.168.0.212:1521:orcl
+    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
     username: enio
     password: enio
   devtools:
@@ -144,7 +144,7 @@ spring:
 
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@192.168.0.212:1521:orcl
+    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
     username: enio
     password: enio
   devtools:
@@ -212,7 +212,7 @@ spring:
 
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@192.168.0.212:1521:orcl
+    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
     username: enio
     password: enio
   devtools:
@@ -245,7 +245,7 @@ spring:
 
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@192.168.0.212:1521:orcl
+    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
     username: enio
     password: enio
   devtools:

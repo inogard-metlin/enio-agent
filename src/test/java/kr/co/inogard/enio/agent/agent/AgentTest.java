@@ -45,7 +45,7 @@ public class AgentTest {
 	  //CharSequence sourcePassword = "ENIOS0001-201902";		//이노가드
 	  //CharSequence sourcePassword = "ENIOS0020-201906";		//호서
 	  //CharSequence sourcePassword = "ENIOS0014-201911";	 	//상명
-	  //CharSequence sourcePassword = "ENIOC0001-202005";	 		//중앙
+	  //CharSequence sourcePassword = "ENIOC0001-202005";	 	//중앙
 	 CharSequence sourcePassword = "ENIOA013Q-202005";	 		//한양사이버대
 	  
 	  //when

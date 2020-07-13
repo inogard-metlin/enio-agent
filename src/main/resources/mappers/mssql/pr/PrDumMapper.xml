@@ -103,13 +103,13 @@
         <include refid="sqlSelect"/>
         <where>
           <if test="search != null">
-            sub_org_cd like #{search.agtCd} || '%'
+            sub_org_cd like #{search.agtCd} + '%'
             <if test="search.value != null and search.value != ''">
             <![CDATA[
             AND (
-              dp.erp_pr_no like '%'||#{search.value}||'%'
-              or dp.ttl like '%'||#{search.value}||'%'
-              or dp.e4u_pr_no like '%'||#{search.value}||'%'
+              dp.erp_pr_no like '%'+#{search.value}+'%'
+              or dp.ttl like '%'+#{search.value}+'%'
+              or dp.e4u_pr_no like '%'+#{search.value}+'%'
             )
             ]]>
             </if>
@@ -133,7 +133,7 @@
   <![CDATA[
     SELECT count(*)
     FROM agt_dum_pr
-    WHERE sub_org_cd like #{agtCd} || '%'
+    WHERE sub_org_cd like #{agtCd} + '%'
   ]]>
   </select>
 
