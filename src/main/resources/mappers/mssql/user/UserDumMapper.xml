@@ -8,7 +8,8 @@
 	    SELECT B.agt_cd + A.seq AS erpUserCd 
 	    FROM   (
 	      SELECT RIGHT('00000' + CONVERT(VARCHAR, ISNULL(MAX(SUBSTRING(I.erp_user_cd, 6, 5)), '00000') + 1), 5) AS SEQ 
-	      FROM   agt_dum_user I
+	        FROM agt_dum_user I
+	       WHERE I.erp_user_cd LIKE #{agtCd} + '%'
 	    ) A 
 	    cross join agt_agent B 
       WHERE B.agt_cd = #{agtCd}
@@ -65,7 +66,7 @@
 		FROM   agt_dum_user A 
 		WHERE  A.user_nm = #{userNm} 
 		    AND A.user_email = #{userEmail}
-            AND A.erp_user_cd LIKE #{agtCd} || '%' 
+            AND A.erp_user_cd LIKE #{agtCd} + '%' 
   ]]>
 	</select>
 

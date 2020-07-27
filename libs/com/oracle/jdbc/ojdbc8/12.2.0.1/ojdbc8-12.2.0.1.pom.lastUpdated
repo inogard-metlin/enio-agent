@@ -1,11 +1,10 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Mon Jul 13 13:59:04 KST 2020
+#Tue Jul 14 09:08:15 KST 2020
 file\://E\:\\Develop\\workspace1\\enio-api\\enio-agent/libs/.lastUpdated=1592464016662
 file\://E\:\\Develop\\spring\\workspace\\enio-agent/libs/.error=
 file\://E\:\\Develop\\workspace1\\enio-api\\enio-agent/libs/.error=
 https\://repo.spring.io/snapshot/.error=
 file\://E\:\\Develop\\workspace1\\enio-agent/libs/.error=
-file\://E\:\\Develop\\IdeaProjects\\enio-agent/libs/.error=
 https\://artifacts.alfresco.com/nexus/content/repositories/public/.error=
 https\://repo.spring.io/milestone/.error=
 file\://E\:\\Develop\\workspace\\ebiz4u\\enio_agent/libs/.error=
@@ -26,7 +25,7 @@ file\://E\:\\Develop\\workspace\\inogard\\enio\\enio-agent/libs/.lastUpdated=159
 https\://repo.maven.apache.org/maven2/.lastUpdated=1594616344072
 file\://E\:\\Develop\\git\\repository\\enio-agent/libs/.lastUpdated=1592195427780
 https\://repo.spring.io/milestone/.lastUpdated=1592292185808
-file\://E\:\\Develop\\IdeaProjects\\enio-agent/libs/.lastUpdated=1594616342698
+file\://E\:\\Develop\\IdeaProjects\\enio-agent/libs/.lastUpdated=1594685295763
 file\://C\:\\Users\\metlin\\git\\enio-agent/libs/.lastUpdated=1592209199266
 https\://repo.maven.apache.org/maven2/.error=
 file\://E\:\\Develop\\workspace1\\enio_agt/libs/.lastUpdated=1592197178374

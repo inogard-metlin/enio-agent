@@ -8,9 +8,10 @@
           <![CDATA[
             SELECT B.agt_cd || A.seq AS erpDeptCd 
             FROM   (
-                          SELECT Substr(To_char(To_number('1' || Nvl(Max(Substr(I.erp_dept_cd, 6, 5)), '00000') + 1)), 2, 5) AS SEQ 
-                           FROM agt_dum_dept I
-                        ) A 
+                      SELECT Substr(To_char(To_number('1' || Nvl(Max(Substr(I.erp_dept_cd, 6, 5)), '00000') + 1)), 2, 5) AS SEQ
+                        FROM agt_dum_dept I
+                       WHERE I.erp_dept_cd LIKE #{agtCd} || '%'
+                    ) A
             CROSS JOIN agt_agent B 
             WHERE B.agt_cd = #{agtCd}
           ]]>

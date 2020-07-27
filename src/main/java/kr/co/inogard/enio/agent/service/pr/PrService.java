@@ -178,7 +178,7 @@ public class PrService {
 	}
 
 	public void updateCallSyncToErp(String prNo, String notiKind) {
-		if (!"A01BU".equals(univCd) && !"S0001".equals(univCd)) {
+		if (!"S0001".equals(univCd)) {
 			try {
 				Map<String, String> info = new HashMap<String, String>();
 				info.put("prNo", prNo);

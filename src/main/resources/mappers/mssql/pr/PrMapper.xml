@@ -276,8 +276,12 @@
 
 
   <update id="updateCallSyncToErp" parameterType="hashmap" statementType="CALLABLE">
-  <![CDATA[
-    { CALL ADMI.SP_AAPA_BID_LINK_RCV( #{prNo}, #{notiKind} ) }
-  ]]>
+      <choose>
+          <when test="univCd != null and univCd.equals('A01BU')">
+              <![CDATA[
+                { CALL ADMI.SP_AAPA_BID_LINK_RCV( #{prNo, mode=IN, jdbcType=VARCHAR}, #{notiKind, mode=IN, jdbcType=VARCHAR} ) }
+              ]]>
+          </when>
+      </choose>
   </update>
 </mapper>

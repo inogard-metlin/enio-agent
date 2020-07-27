@@ -121,7 +121,7 @@ public class PoService {
 		}		
 		
 		try {
-			if(!"A01BU".equals(univCd) && !"S0001".equals(univCd)) {  // 울산 Legacy  동기화 제외
+			if(!"S0001".equals(univCd)) {  // 울산 Legacy  동기화 제외
 				this.updateCallSyncToErp(po.getPoNo(), po.getRfqNo(), "PO_END");
 			}	
 		} catch (Exception e) {

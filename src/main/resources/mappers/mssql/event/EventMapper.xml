@@ -48,7 +48,7 @@
           <if test="search != null">
             <if test="search.value != null and search.value != ''">
             <![CDATA[
-              evt.evt_cmd_param like '%'||#{search.value}||'%'
+              evt.evt_cmd_param like '%'+#{search.value}+'%'
             ]]>
             </if>
             <if test="search.evtIoType != null and search.evtIoType != ''">

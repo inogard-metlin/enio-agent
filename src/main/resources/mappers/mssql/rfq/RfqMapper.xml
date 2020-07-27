@@ -200,9 +200,13 @@
   </update>
 
   <update id="updateCallSyncToErp" parameterType="hashmap" statementType="CALLABLE">
-  <![CDATA[
-    { call DSADM.P_APC_BID_REVE(#{erpRfqNo, mode=IN, jdbcType=VARCHAR}, #{outCd, mode=OUT, jdbcType=VARCHAR}, #{outMsg, mode=OUT, jdbcType=VARCHAR}) }
-  ]]>
+      <choose>
+          <when test="univCd != null and univCd.equals('A01BU')">
+              <![CDATA[
+                { call DSADM.P_APC_BID_REVE(#{erpRfqNo, mode=IN, jdbcType=VARCHAR}, #{outCd, mode=OUT, jdbcType=VARCHAR}, #{outMsg, mode=OUT, jdbcType=VARCHAR}) }
+              ]]>
+          </when>
+      </choose>
   </update>
 
   <delete id="delRfq" parameterType="string">

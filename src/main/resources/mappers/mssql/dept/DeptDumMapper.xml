@@ -10,7 +10,8 @@
       SELECT B.agt_cd + A.seq AS erpDeptCd 
       FROM   (
         SELECT RIGHT('00000' + CONVERT(VARCHAR, ISNULL(MAX(SUBSTRING(I.ERP_DEPT_CD, 6, 5)), '00000') + 1), 5) AS SEQ 
-        FROM   agt_dum_dept I
+          FROM agt_dum_dept I
+         WHERE I.erp_dept_cd LIKE #{agtCd} + '%'
       ) A 
       cross join agt_agent B
       WHERE B.agt_cd = #{agtCd} 
@@ -58,7 +59,7 @@
 		       A.e4u_dept_cd 
 		FROM   agt_dum_dept A 
 		WHERE  A.dept_nm = #{deptNm}
-           AND A.erp_dept_cd LIKE #{agtCd} || '%' 
+           AND A.erp_dept_cd LIKE #{agtCd} + '%' 
   ]]>
   </select>
 

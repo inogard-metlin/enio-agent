@@ -148,28 +148,26 @@ public class RfqService {
 			rfq.setErpRfqNo(pr.getErpRfqNo());
 			rfqMapper.updateErpRfqNo(rfq);
 
-			try {
-				Map<String, String> info = new HashMap<String, String>();
-				info.put("erpRfqNo", rfq.getErpRfqNo());
-				info.put("univCd", univCd);
-				info.put("notiKind", "BID_END");
-				info.put("outCd", "");
-				info.put("outMsg", "");
-				
-				if(!"A01BU".equals(univCd) && !"S0001".equals(univCd)) {   // 울산 Legacy  동기화 제외
+			if(!"S0001".equals(univCd)) {   // 울산 Legacy  동기화 제외
+				try {
+					Map<String, String> info = new HashMap<String, String>();
+					info.put("erpRfqNo", rfq.getErpRfqNo());
+					info.put("univCd", univCd);
+					info.put("notiKind", "BID_END");
+					info.put("outCd", "");
+					info.put("outMsg", "");
+
 					rfqMapper.updateCallSyncToErp(info);
-				}
-				
-				log.debug("outCd : {}", info.get("outCd"));
-				log.debug("outMsg : {}", info.get("outMsg"));
-				
-				if(!"A01BU".equals(univCd) && !"S0001".equals(univCd)) {
+
+					log.debug("outCd : {}", info.get("outCd"));
+					log.debug("outMsg : {}", info.get("outMsg"));
+
 					if (!"1".equals(info.get("outCd"))) {
 						throw new RuntimeException(info.get("outMsg"));
 					}
-				}	
-			} catch (Exception e) {
-				log.error("ERP동기화(erpRfq_no=" + rfq.getErpRfqNo() + ",BID_END):작업오류발생", e);
+				} catch (Exception e) {
+					log.error("ERP동기화(erpRfq_no=" + rfq.getErpRfqNo() + ",BID_END):작업오류발생", e);
+				}
 			}
 		}
 	}
