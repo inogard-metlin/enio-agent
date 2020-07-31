@@ -40,7 +40,7 @@ spring:
  # 울산대학교 개발,운영 ##       
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:jtds:sqlserver://172.25.80.140:1433/enio
+    url: jdbc:log4jdbc:jtds:sqlserver://1.253.80.140:1433/enio
     username: enio
     password: enio_0101!
   devtools:
