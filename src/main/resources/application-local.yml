@@ -228,13 +228,13 @@ mybatis:
     jdbcTypeForNull: varchar
 
 logging:
-  path: e:/Develop/var/enio/enio-agent/C0001/logs/
+  path: d:/C0001/logs/
 
 enio:
   univ-cd: C0001
   file:
-    temp-dir: e:/Develop/var/enio/enio-agent/C0001/temps/
-    pds-dir: e:/Develop/var/enio/enio-agent/C0001/pds/
+    temp-dir: d:/C0001/temps/
+    pds-dir: d:/C0001/pds/
   scheduled:
     cron: 0 0/1 * * * ? 
 
