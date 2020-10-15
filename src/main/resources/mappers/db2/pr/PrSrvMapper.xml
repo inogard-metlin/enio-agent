@@ -69,4 +69,10 @@
                  ) 
           ]]>
 	</insert>
+
+    <delete id="delPrService" parameterType="string">
+      <![CDATA[
+          DELETE agt_prservice Where pr_no = #{prNo}
+      ]]>
+    </delete>
 </mapper>

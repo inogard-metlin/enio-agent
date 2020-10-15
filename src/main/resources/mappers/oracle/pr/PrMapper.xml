@@ -307,5 +307,10 @@
         </when>  
     </choose>
   </update>
-  
+
+    <delete id="delPr" parameterType="string">
+          <![CDATA[
+              DELETE agt_pr Where pr_no = #{prNo}
+          ]]>
+    </delete>
 </mapper>

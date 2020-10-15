@@ -52,24 +52,30 @@
 	</insert>
 	
 	<insert id="addByPrebid" parameterType="kr.co.inogard.enio.agent.domain.pr.PrSrv">
-  <![CDATA[
-		INSERT INTO agt_prservice (
-      pr_no, 
-      item_seq, 
-      srv_seq, 
-      srv_nm, 
-      srv_cd, 
-      unit_cd, 
-      qty
-    ) VALUES (
-      #{prNo}, 
-      #{itemSeq}, 
-      #{srvSeq}, 
-      #{srvNm}, 
-      '9999', 
-      'SET', 
-      1
-    ) 
-  ]]>
+      <![CDATA[
+            INSERT INTO agt_prservice (
+          pr_no,
+          item_seq,
+          srv_seq,
+          srv_nm,
+          srv_cd,
+          unit_cd,
+          qty
+        ) VALUES (
+          #{prNo},
+          #{itemSeq},
+          #{srvSeq},
+          #{srvNm},
+          '9999',
+          'SET',
+          1
+        )
+      ]]>
 	</insert>
+
+    <delete id="delPrService" parameterType="string">
+      <![CDATA[
+          DELETE agt_prservice Where pr_no = #{prNo}
+      ]]>
+    </delete>
 </mapper>

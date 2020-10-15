@@ -29,4 +29,5 @@ public interface PrMapper {
 
   void updateCallSyncToErp(Map<String, String> info);
 
+  void delPr(@Param("prNo") String prNo);
 }

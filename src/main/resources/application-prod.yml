@@ -210,9 +210,9 @@ spring:
 # 중앙대학교 개발 ##
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@192.168.0.212:1521:orcl
-    username: enio
-    password: enio
+    url: jdbc:log4jdbc:oracle:thin:@10.77.3.2:1521/CAUDB
+    username: inogard
+    password: ino2019!22
   devtools:
     restart:
       enabled: true
@@ -233,7 +233,7 @@ enio:
   file:
     temp-dir: c:/enio/enio-agent/temps/
     pds-dir: c:/enio/enio-agent/pds/
-    
+
   scheduled:
     cron: 0 0/1 * * * ?
 

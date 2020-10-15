@@ -124,4 +124,10 @@
 		       AND item_seq = #{itemSeq} 
   ]]>
   </update>
+
+    <delete id="delPrItem" parameterType="string">
+          <![CDATA[
+              DELETE agt_pritem Where pr_no = #{prNo}
+          ]]>
+    </delete>
 </mapper>

@@ -68,4 +68,10 @@
       ) 
 		]]>
   </insert>
+
+  <delete id="delPrFile" parameterType="string">
+      <![CDATA[
+          DELETE agt_prfile Where pr_no = #{prNo}
+      ]]>
+  </delete>
 </mapper>

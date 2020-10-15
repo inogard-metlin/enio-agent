@@ -8,11 +8,11 @@ import kr.co.inogard.enio.agent.domain.pr.PrSrv;
 @Mapper
 public interface PrSrvMapper {
 
-  List<PrSrv> findAllByPrNoAndItemSeq(@Param("prNo") String prNo,
-      @Param("itemSeq") String itemSeq);
+  List<PrSrv> findAllByPrNoAndItemSeq(@Param("prNo") String prNo, @Param("itemSeq") String itemSeq);
 
   void addFromDummy(PrSrv prSrv);
 
   void addByPrebid(PrSrv prSrv);
 
+  void delPrService(@Param("prNo") String prNo);
 }

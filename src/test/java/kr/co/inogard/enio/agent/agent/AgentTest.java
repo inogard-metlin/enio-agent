@@ -46,8 +46,8 @@ public class AgentTest {
 	  //CharSequence sourcePassword = "ENIOS0020-201906";		//호서
 	  //CharSequence sourcePassword = "ENIOS0014-201911";	 	//상명
 	  //CharSequence sourcePassword = "ENIOC0001-202005";	 	//중앙
-	 CharSequence sourcePassword = "ENIOA013Q-202005";	 		//한양사이버대
-	  
+	  CharSequence sourcePassword = "ENIOA013Q-202005";	 		//한양사이버대
+
 	  //when
 	  String encodedPassword = bCryptPasswordEncoder.encode(sourcePassword);
 	  
@@ -65,8 +65,8 @@ public class AgentTest {
 	  //String sourceLicenseKey = "ENIOS0014-201911";   //상명
 	  //String sourceLicenseKey = "ENIOC0001-202005";    	//중앙
 	  String sourceLicenseKey = "ENIOA013Q-202005";    	//한양사이버대
-	  
-	  //when
+
+      //when
 	  String encodedLicenseKey = Base64.getEncoder().encodeToString(sourceLicenseKey.getBytes());
 	  String decodedLicenseKey = new String (Base64.getDecoder().decode(encodedLicenseKey.getBytes()));
 	  

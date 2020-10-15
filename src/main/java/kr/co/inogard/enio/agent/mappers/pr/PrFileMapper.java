@@ -14,4 +14,6 @@ public interface PrFileMapper {
   void addFromDummy(PrFile prFile);
 
   void add(PrFile prFile);
+
+  void delPrFile(@Param("prNo") String prNo);
 }

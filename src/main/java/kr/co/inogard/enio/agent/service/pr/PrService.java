@@ -118,9 +118,17 @@ public class PrService {
 	public Pr createPrByPrebid(PrDto.Create prDto, List<MultipartFile> files) {
 		Pr pr = modelMapper.map(prDto, Pr.class);
 		pr.setPrebidYn("Y");
-		prMapper.addByPrebid(pr);
-
 		String prNo = pr.getPrNo();
+
+		//이미 구매의뢰정보가 있는지 확인한 후 모두 삭제해 줌.
+		if (getPr(prNo) != null) {
+			prFileMapper.delPrFile(prNo);
+			prSrvMapper.delPrService(prNo);
+			prItemMapper.delPrItem(prNo);
+			prMapper.delPr(prNo);
+		}
+
+		prMapper.addByPrebid(pr);
 
 		for (PrItemDto.Create creItem : prDto.getItemList()) {
 			PrItem prItem = modelMapper.map(creItem, PrItem.class);
@@ -294,30 +302,30 @@ public class PrService {
 	}
 
 	public void saveFileFromLink(PrFileDum prFileDum) {
-			try {
-			
-				log.info("SvrFileLink:  {}",  prFileDum.getSvrFileLink());
-				log.info("destFile:  {}", prFileDum.getSvrFilePath() + "/" + prFileDum.getSvrFileNm());
-				
-				URL fileLink = new URL(prFileDum.getSvrFileLink());
-				File destFile = new File(prFileDum.getSvrFilePath() + "/" + prFileDum.getSvrFileNm());
-				
-				if (!destFile.getParentFile().exists()) destFile.getParentFile().mkdirs();
-				
-				ReadableByteChannel rbc = Channels.newChannel(fileLink.openStream());			
-				
-				FileOutputStream fos = new FileOutputStream(destFile);
-				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-				
-				fos.close();
-				rbc.close();
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+
+			log.info("SvrFileLink:  {}",  prFileDum.getSvrFileLink());
+			log.info("destFile:  {}", prFileDum.getSvrFilePath() + "/" + prFileDum.getSvrFileNm());
+
+			URL fileLink = new URL(prFileDum.getSvrFileLink());
+			File destFile = new File(prFileDum.getSvrFilePath() + "/" + prFileDum.getSvrFileNm());
+
+			if (!destFile.getParentFile().exists()) destFile.getParentFile().mkdirs();
+
+			ReadableByteChannel rbc = Channels.newChannel(fileLink.openStream());
+
+			FileOutputStream fos = new FileOutputStream(destFile);
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
+			fos.close();
+			rbc.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 	
