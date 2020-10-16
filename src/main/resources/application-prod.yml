@@ -207,7 +207,7 @@ enio:
 spring:
   profiles: oracle,C0001
 
-# 중앙대학교 개발 ##
+# 중앙대학교 운영 ##
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:oracle:thin:@10.77.3.2:1521/CAUDB

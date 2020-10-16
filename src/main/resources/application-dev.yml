@@ -269,24 +269,24 @@ spring:
   profiles: oracle,C0001
 
 # 중앙대학교 개발/운영 ##
-#  datasource:
-#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-#    url: jdbc:log4jdbc:oracle:thin:@10.77.3.2:1521/CAUDB
-#    username: inogard
-#    password: ino2019!22
-#  devtools:
-#    restart:
-#      enabled: true
-            
-# 이노가드 개발 ##
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
-    username: enio
-    password: enio
+    url: jdbc:log4jdbc:oracle:thin:@10.77.3.2:1521/CAUDB
+    username: inogard
+    password: ino2019!22
   devtools:
     restart:
       enabled: true
+            
+# 이노가드 개발 ##
+#  datasource:
+#    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#    url: jdbc:log4jdbc:oracle:thin:@112.220.235.235:1521:orcl
+#    username: enio
+#    password: enio
+#  devtools:
+#    restart:
+#      enabled: true
             
 mybatis:
   typeAliasesPackage: kr.co.inogard.enio.agent.domain
@@ -297,16 +297,16 @@ mybatis:
     jdbcTypeForNull: varchar
 
 logging:
-#  path: c:/enio/enio-agent/logs/
-  path: e:/enio/enio-agent/C0001/logs/
+  path: c:/enio/enio-agent/logs/
+#  path: e:/enio/enio-agent/C0001/logs/
 
 enio:
   univ-cd: C0001
   file:
-#    temp-dir: c:/enio/enio-agent/temps/
-#    pds-dir: c:/enio/enio-agent/pds/
-    temp-dir: e:/enio/enio-agent/C0001/temps/
-    pds-dir: e:/enio/enio-agent/C0001/pds/
+    temp-dir: c:/enio/enio-agent/temps/
+    pds-dir: c:/enio/enio-agent/pds/
+#    temp-dir: e:/enio/enio-agent/C0001/temps/
+#    pds-dir: e:/enio/enio-agent/C0001/pds/
 
   scheduled:
     cron: 0 0/1 * * * ?
